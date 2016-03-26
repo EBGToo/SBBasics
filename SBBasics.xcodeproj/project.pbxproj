@@ -73,6 +73,7 @@
 		3C2A80D11BFFC580005FFF43 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3C3A15A11BFFD51500135446 /* BagTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BagTest.swift; sourceTree = "<group>"; };
 		3C7C278C1CA48D20001B31A8 /* SBCommons.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SBCommons.framework; path = "../../../Library/Developer/Xcode/DerivedData/SB-eamescwzvtituiaculknzgswpuaq/Build/Products/Debug/SBCommons.framework"; sourceTree = "<group>"; };
+		3C886DB91CA600E50026E5F4 /* SBBasics.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = SBBasics.playground; sourceTree = "<group>"; };
 		3CE261321C19470500BE08C4 /* RingTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RingTest.swift; sourceTree = "<group>"; };
 		3CE5D1B01C178EA400550AD6 /* Ring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Ring.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -101,6 +102,7 @@
 		3C2895171BFFB78400C85BD2 = {
 			isa = PBXGroup;
 			children = (
+				3C886DB91CA600E50026E5F4 /* SBBasics.playground */,
 				3C2895231BFFB78400C85BD2 /* Sources */,
 				3C28952F1BFFB78400C85BD2 /* Tests */,
 				3C2A80CD1BFFC568005FFF43 /* Share */,
