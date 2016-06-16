@@ -23,7 +23,7 @@ protocol QueueType {
   var tail : Item? { get }
   
   /// Enqueue `item` to the tail of the queue.
-  mutating func enqueue (item : Item)
+  mutating func enqueue (_ item : Item)
 
   /// Dequeue `item` from the head of the queue
   mutating func dequeue () -> Item?
@@ -34,7 +34,7 @@ protocol QueueType {
   ///
   /// - returns: A Queue\<T\> with the results of applying `transform` to each `item`
   ///
-  func map<T> (@noescape transform: (Item) -> T) -> Queue<T>
+  func map<T> ( _ transform: @noescape (Item) -> T) -> Queue<T>
 }
 
 // MARK: - Queue
@@ -70,20 +70,20 @@ public struct Queue<E> : QueueType {
   }
   
   /// Enqueue `item` to the tail of the queue.
-  public mutating func enqueue (item : Item) {
+  public mutating func enqueue (_ item : Item) {
     objs.append (item)
   }
   
   /// Dequeue `item` from the head of the queue
   public mutating func dequeue () -> Item? {
     if let result = objs.first {
-      objs.removeAtIndex(0)
+      objs.remove(at: 0)
       return result
     }
     return nil
   }
   
-  public func map<T> (@noescape transform: (Item) -> T) -> Queue<T> {
+  public func map<T> ( _ transform: @noescape (Item) -> T) -> Queue<T> {
     return Queue<T>(objs: objs.map(transform))
   }
 }
@@ -114,15 +114,15 @@ extension Queue : BagType {
     return objs.isEmpty
   }
   
-  public func app (@noescape apply: (Item) -> Void) -> Void {
+  public func app (_ apply: @noescape (Item) -> Void) -> Void {
     objs.forEach(apply)
   }
   
-  public func app (@noescape apply: (Item) throws -> Void) rethrows -> Void {
+  public func app (_ apply: @noescape (Item) throws -> Void) rethrows -> Void {
     try objs.forEach(apply)
   }
   
-  public func filter (@noescape includeElement: (Item) -> Bool) -> Queue<Item> {
+  public func filter ( _ includeElement: @noescape (Item) -> Bool) -> Queue<Item> {
     return Queue<Item> (objs: objs.filter (includeElement))
   }
   
@@ -136,7 +136,7 @@ extension Queue : BagType {
 }
 
 extension Queue where E : Equatable {
-  public func contains (item: Item) -> Bool {
+  public func contains (_ item: Item) -> Bool {
     return objs.contains (item)
   }
 }
@@ -147,7 +147,7 @@ extension Queue where E : Equatable {
 /// A Queue is an OrderedBagType
 ///
 extension Queue : OrderedBagType {
-  public func reduce<Result>(initial: Result, @noescape combine: (Result, E) -> Result) -> Result {
+  public func reduce<Result>(_ initial: Result, combine: @noescape (Result, E) -> Result) -> Result {
     return objs.reduce (initial, combine: combine)
   }
 }

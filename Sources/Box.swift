@@ -13,9 +13,9 @@ import SBCommons
 //
 
 public enum BoxColor {
-  case White
-  case Gray
-  case Black
+  case white
+  case gray
+  case black
 }
 
 
@@ -28,7 +28,7 @@ public enum BoxColor {
 public class Box<Item> : Equatable {
 
   /// The color */
-  public var color : BoxColor = .White
+  public var color : BoxColor = .white
 
   /// The item */
   public let item : Item
@@ -52,7 +52,7 @@ public class Box<Item> : Equatable {
   }
 
   /// Return true is self has box as its parent.
-  public func hasParent (box: Box<Item>) -> Bool {
+  public func hasParent (_ box: Box<Item>) -> Bool {
     return box == parent
     //    return nil != parent && box == parent!
   }
@@ -136,26 +136,26 @@ public final class BoxedTree<Item> : Box<Item> {
   /// The kids
   public internal(set) var kids : [BoxedTree<Item>] = []
 
-  public func addKid (kid : BoxedTree<Item>) {
+  public func addKid (_ kid : BoxedTree<Item>) {
     precondition(!kid.parentExists, "The kid \(kid) already has a parent")
     
     kid.parent = self
     kids.append(kid)
   }
   
-  public func remKid (kid : BoxedTree<Item>) {
-    if let index = kids.indexOf(kid) {
+  public func remKid (_ kid : BoxedTree<Item>) {
+    if let index = kids.index(of: kid) {
       kid.parent = nil
-      kids.removeAtIndex(index)
+      kids.remove(at: index)
     }
     else { preconditionFailure("The parent of kid \(kid) is not me.") }
   }
   
-  public func hasKid (kid: BoxedTree<Item>) -> Bool {
-    return nil != kids.indexOf(kid)
+  public func hasKid (_ kid: BoxedTree<Item>) -> Bool {
+    return nil != kids.index(of: kid)
   }
   
-  public func appKids (f: (kid:BoxedTree<Item>) -> ()) {
+  public func appKids (_ f: (kid:BoxedTree<Item>) -> ()) {
     kids.app(f)
   }
   
@@ -171,15 +171,15 @@ public final class BoxedTree<Item> : Box<Item> {
     return result
   }
   
-  public func appDescendents (f: (d:BoxedTree<Item>) -> ()) {
+  public func appDescendents (_ f: (d:BoxedTree<Item>) -> ()) {
     f (d: self)
     appKids { (kid) -> () in kid.appDescendents(f) }
   }
   
   // MARK: Successor (Depth First Pre-Order)
   
-  func successorToKid (kid: BoxedTree<Item>) -> BoxedTree<Item>? {
-    if let index : Array.Index = kids.indexOf (kid) {
+  func successorToKid (_ kid: BoxedTree<Item>) -> BoxedTree<Item>? {
+    if let index : Array.Index = kids.index (of: kid) {
       return (index + 1 < kids.count
         ? kids[index + 1]
         : (parent as? BoxedTree<Item>)?.successorToKid(self))
@@ -230,23 +230,23 @@ extension BoxedTree : TreeType {
       : kids.reduce(1) { return max ($0, $1.height) }
   }
   
-  func lookup (item: Item, pred: (Item, Item) -> Bool) -> BoxedTree<Item>? {
+  func lookup (_ item: Item, pred: (Item, Item) -> Bool) -> BoxedTree<Item>? {
     return nil
   }
   
-  public func depth (item: Item, pred: (Item, Item) -> Bool) -> Int? {
+  public func depth (_ item: Item, pred: (Item, Item) -> Bool) -> Int? {
     return lookup (item, pred: pred).map { $0.depth }
   }
   
   /** The parent of item if found based on `pred` */
-  public func parent (item: Item, pred: (Item, Item) -> Bool) -> BoxedTree<Item>? {
+  public func parent (_ item: Item, pred: (Item, Item) -> Bool) -> BoxedTree<Item>? {
     return lookup (item, pred: pred).flatMap { $0.parent as? BoxedTree }
   }
   
-  public func walkByBreadth(preOrder preOrder: Visitor?, postOrder: Visitor?) {
+  public func walkByBreadth(preOrder: Visitor?, postOrder: Visitor?) {
     var queue = Queue<BoxedTree<Item>>()
     
-    func walk (tree:BoxedTree<Item>) {
+    func walk (_ tree:BoxedTree<Item>) {
       preOrder? (tree.item)
       
       tree.kids.forEach {
@@ -261,8 +261,8 @@ extension BoxedTree : TreeType {
     walk(self)
   }
   
-  public func walkByDepth (preOrder preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?) {
-    func rwalk (t: BoxedTree<Item>) {
+  public func walkByDepth (preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?) {
+    func rwalk (_ t: BoxedTree<Item>) {
       t.walkByDepth (preOrder: preOrder, inOrder: inOrder, postOrder: postOrder)
     }
     
@@ -283,11 +283,11 @@ extension BoxedTree : TreeType {
     //return kids.map { $0.items }.reduce([item]) { $0.appendContentsOf($1) }
     
     var result = [item]
-    kids.map { $0.array }.forEach { result.appendContentsOf($0) }
+    kids.map { $0.array }.forEach { result.append(contentsOf: $0) }
     return result
   }
   
-  public func contains (item: Item, pred: (Item, Item) -> Bool) -> Bool {
+  public func contains (_ item: Item, pred: (Item, Item) -> Bool) -> Bool {
     return pred (self.item, item)
       || kids.any { $0.contains (item, pred: pred) }
   }
@@ -316,11 +316,11 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
   //
   public var left  : BinaryBox<Item>?
   
-  public func hasLeft (left: BinaryBox<Item>) -> Bool {
+  public func hasLeft (_ left: BinaryBox<Item>) -> Bool {
     return nil != self.left && self.left! === left
   }
   
-  public func addLeft (left: BinaryBox<Item>) {
+  public func addLeft (_ left: BinaryBox<Item>) {
     if nil != self.left { remLeft() }
     self.left = left
     left.root = self
@@ -334,7 +334,7 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
   }
 
   // Make BOX be LEFT.  Combines remLeft(), when SELF.LEFT exists, and addLeft()
-  internal func spliceAtLeft (box: BinaryBox<Item>) -> BinaryBox<Item>? {
+  internal func spliceAtLeft (_ box: BinaryBox<Item>) -> BinaryBox<Item>? {
     let old = self.left
     
     if nil != old { old!.root = nil }
@@ -348,11 +348,11 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
   //
   public var right : BinaryBox<Item>?
   
-  public func hasRight (right: BinaryBox<Item>) -> Bool {
+  public func hasRight (_ right: BinaryBox<Item>) -> Bool {
     return nil != self.right && self.right! === right
   }
   
-  public func addRight (right: BinaryBox<Item>) {
+  public func addRight (_ right: BinaryBox<Item>) {
     if nil != self.right { remRight () }
     self.right = right
     right.root = self
@@ -369,7 +369,7 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
   // Make BOX be RIGHT.  Combines remRight(), when SELF.RIGHT exsits, and
   // addRight()
   //
-  internal func spliceAtRight (box : BinaryBox<Item>) -> BinaryBox<Item>? {
+  internal func spliceAtRight (_ box : BinaryBox<Item>) -> BinaryBox<Item>? {
     let old = self.right
     
     if nil != old { old!.root = nil }
@@ -420,11 +420,11 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
   //
   //
   //
-  public func hasLeftOrRight (box: BinaryBox<Item>) -> Bool {
+  public func hasLeftOrRight (_ box: BinaryBox<Item>) -> Bool {
     return hasLeft (box) || hasRight (box)
   }
   
-  public func hasLeftAndRight (left: BinaryBox<Item>, right: BinaryBox<Item>) -> Bool {
+  public func hasLeftAndRight (_ left: BinaryBox<Item>, right: BinaryBox<Item>) -> Bool {
     return hasLeft(left) && hasRight(right)
   }
 
@@ -440,7 +440,7 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
   // Box With Kids
   //
   
-  func appKids (funk : ((BinaryBox<Item>) -> Void)) {
+  func appKids (_ funk : ((BinaryBox<Item>) -> Void)) {
     if nil != left  { funk (left!)  }
     if nil != right { funk (right!) }
   }
@@ -454,7 +454,7 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
     //    }
   }
   
-  func appDescendents (funk : ((BinaryBox<Item>) -> Void)) {
+  func appDescendents (_ funk : ((BinaryBox<Item>) -> Void)) {
     assertionFailure("Unimplemented")
     return
   }
@@ -495,7 +495,7 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
   
   // MARK: Lookup
   
-  internal func lookup (item: Item) -> BinaryBox<Item>? {
+  internal func lookup (_ item: Item) -> BinaryBox<Item>? {
     if self.item < item { return left?.lookup(item) }
     if self.item > item { return right?.lookup(item) }
     return self
@@ -504,7 +504,7 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
   //
   //
   //
-  public func hasValue (item: Item, pred: (Item, Item) -> Bool) -> Bool {
+  public func hasValue (_ item: Item, pred: (Item, Item) -> Bool) -> Bool {
     return pred (self.item, item) ||
       (nil != left  && left! .hasValue(item, pred: pred)) ||
       (nil != right && right!.hasValue(item, pred: pred))
@@ -542,23 +542,23 @@ extension BinaryBox : TreeType {
       (nil == right ? 0 : 1 + right!.height))
   }
  
-  public func depth (item: Item, pred: (Item, Item) -> Bool) -> Int? {
+  public func depth (_ item: Item, pred: (Item, Item) -> Bool) -> Int? {
     return 0
   }
   
   /** The parent of item if found based on `pred` */
-  public func parent (item: Item, pred: (Item, Item) -> Bool) -> BinaryBox<Item>? {
+  public func parent (_ item: Item, pred: (Item, Item) -> Bool) -> BinaryBox<Item>? {
     return nil
   }
   
-  public func contains (item: Item, pred: (Item, Item) -> Bool) -> Bool {
+  public func contains (_ item: Item, pred: (Item, Item) -> Bool) -> Bool {
     return false
   }
 
-  public func walkByBreadth(preOrder preOrder: Visitor?, postOrder: Visitor?) {
+  public func walkByBreadth(preOrder: Visitor?, postOrder: Visitor?) {
     var queue = Queue<BinaryBox<Item>>()
     
-    func walk (tree:BinaryBox<Item>) {
+    func walk (_ tree:BinaryBox<Item>) {
       preOrder? (tree.item)
       
       tree.kids.forEach {
@@ -574,8 +574,8 @@ extension BinaryBox : TreeType {
   }
   
   /** */
-  public func walkByDepth (preOrder preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?) {
-    func rwalk (t: BinaryBox<Item>) {
+  public func walkByDepth (preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?) {
+    func rwalk (_ t: BinaryBox<Item>) {
       t.walkByDepth (preOrder: preOrder, inOrder: inOrder, postOrder: postOrder)
     }
     
@@ -593,17 +593,17 @@ extension BinaryBox : TreeType {
 // MARK: BinaryBox as BinaryTreeType
 
 extension BinaryBox : BinaryTreeType {
-  public func contains (item: Item) -> Bool {
+  public func contains (_ item: Item) -> Bool {
     return false
   }
   
   /// Depth (number of parents) to `item` (if it exists), otherwise nil
-  public func depth (item: Item) -> Int? {
+  public func depth (_ item: Item) -> Int? {
     return nil
   }
   
   /// The parent of `item` (if it exists), otherwise nil
-  public func parent (item: Item) -> BinaryBox<Item>? {
+  public func parent (_ item: Item) -> BinaryBox<Item>? {
     return nil
   }
   
@@ -617,11 +617,11 @@ extension BinaryBox : BinaryTreeType {
     return right ?? self
   }
   
-  public func successor (item: Item) -> BinaryBox<Item>? {
+  public func successor (_ item: Item) -> BinaryBox<Item>? {
     return lookup(item)?.successor ?? self
   }
 
-  public func predecessor (item: Item) -> BinaryBox<Item>? {
+  public func predecessor (_ item: Item) -> BinaryBox<Item>? {
     return lookup(item)?.predecessor ?? self
   }
 }

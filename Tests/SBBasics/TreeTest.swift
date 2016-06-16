@@ -23,12 +23,12 @@ func < <Item: Comparable, Value> (lhs:BoxX<Item, Value>, rhs:BoxX<Item, Value>) 
 
 class TreeTest: XCTestCase {
   let perfCount = 1000
-  var perfArray = Array<Int>(count: 1000, repeatedValue: 0)
+  var perfArray = Array<Int>(repeating: 0, count: 1000)
 
   
   override func setUp() {
     super.setUp()
-    for i in 0..<perfCount { perfArray[i] = random() % perfCount }
+    for i in 0..<perfCount { perfArray[i] = Int(arc4random()) % perfCount }
   }
   
   override func tearDown() {
@@ -107,7 +107,7 @@ class TreeTest: XCTestCase {
     
     let t1 = Tree<Int>(item: 1, kids: [t2, t3, t4])
 
-    var g1 = [1,2,3,4,5,6,7,8,9,10,11,12].generate()
+    var g1 = [1,2,3,4,5,6,7,8,9,10,11,12].makeIterator()
     t1.walkByBreadth { XCTAssertEqual($0, g1.next()) }
   }
   
@@ -146,53 +146,53 @@ class TreeTest: XCTestCase {
     XCTAssertEqual(t.degree, 2)
     XCTAssertEqual(t.depth(t.item), 0)
 
-    var g = [0, 5, 10, 15, 20, 25, 30].generate();
+    var g = [0, 5, 10, 15, 20, 25, 30].makeIterator();
     t.walkByDepth { XCTAssertEqual($0, g.next()) }
     
-    g = [0, 10].generate()
+    g = [0, 10].makeIterator()
     BinaryTree<Int>(items: [0, 10]).walkByDepth { XCTAssertEqual($0, g.next()) }
 
-    g = [0, 5, 10, 15].generate()
+    g = [0, 5, 10, 15].makeIterator()
     BinaryTree<Int>(items: [15, 10, 0, 5]).walkByDepth { XCTAssertEqual($0, g.next()) }
     
-    g = [0, 5, 10, 15, 20].generate()
+    g = [0, 5, 10, 15, 20].makeIterator()
     BinaryTree<Int>(items: [15, 20, 10, 0, 5]).walkByDepth { XCTAssertEqual($0, g.next()) }
     
   }
 
   func testBinaryTreeDelete () {
     var t : BinaryTree<Int> = [0, 5, 10]
-    var g = [0].generate()
+    var g = [0].makeIterator()
     
     t.delete(0)
-    g = [5, 10].generate()
+    g = [5, 10].makeIterator()
     t.walkByDepth { XCTAssertEqual($0, g.next()) }
     
     t.delete(10)
-    g = [5].generate()
+    g = [5].makeIterator()
     t.walkByDepth { XCTAssertEqual($0, g.next()) }
     
     t.delete(5)
     XCTAssertTrue(t.count == 0)
 
     t = BinaryTree<Int>(items: [0, 5, 10, 15, 20])
-    g = [0, 5, 10, 15, 20].generate()
+    g = [0, 5, 10, 15, 20].makeIterator()
     t.walkByDepth { XCTAssertEqual($0, g.next()) }
 
     t.delete(10)
-    g = [0, 5, 15, 20].generate()
+    g = [0, 5, 15, 20].makeIterator()
     t.walkByDepth { XCTAssertEqual($0, g.next()) }
     
     t.delete(0)
-    g = [5, 15, 20].generate()
+    g = [5, 15, 20].makeIterator()
     t.walkByDepth { XCTAssertEqual($0, g.next()) }
     
     t.delete(15)
-    g = [5, 20].generate()
+    g = [5, 20].makeIterator()
     t.walkByDepth { XCTAssertEqual($0, g.next()) }
     
     t.delete(5)
-    g = [20].generate()
+    g = [20].makeIterator()
     t.walkByDepth { XCTAssertEqual($0, g.next()) }
     
     t.delete(20)
@@ -206,7 +206,7 @@ class TreeTest: XCTestCase {
     t.insert(BoxX(item: 7, value: "seven"))
     t.insert(BoxX(item: 6, value: "six"))
     
-    var g = ["three", "five", "six", "seven"].generate()
+    var g = ["three", "five", "six", "seven"].makeIterator()
     t.walkByDepth { XCTAssertEqual($0.value, g.next()) }
   }
   
@@ -214,7 +214,7 @@ class TreeTest: XCTestCase {
     var ty = BinaryTree<Int>()
     let n = 10
     for _ in 0..<n {
-      ty.insert (random() % n)
+      ty.insert (Int(arc4random()) % n)
     }
     ty.count
     ty.left?.height
@@ -223,7 +223,7 @@ class TreeTest: XCTestCase {
     var tz = BinaryTree<Int>()
     let m = 10
     for _ in 0..<m {
-      tz.insert (random() % m)
+      tz.insert (Int(arc4random()) % m)
     }
     tz.count
     tz.left?.height
@@ -256,14 +256,14 @@ class TreeTest: XCTestCase {
   }
  
   func testPerformanceOneByOne() {
-    self.measureBlock() {
+    self.measure() {
       var t = BinaryTree<Int>()
       for i in 0..<self.perfCount { t.insert(self.perfArray[i]) }
     }
   }
   
   func testPerformanceAtOnce () {
-    self.measureBlock {
+    self.measure {
       var _ = BinaryTree<Int>(items: self.perfArray)
     }
     

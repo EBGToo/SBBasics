@@ -66,7 +66,7 @@ class QueueTest: XCTestCase {
   }
   
   func testPerformanceExample() {
-    self.measureBlock() {
+    self.measure() {
     }
   }
 }

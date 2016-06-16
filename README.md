@@ -92,4 +92,5 @@ pod 'SBBasics', '~> 0.1'
 $ git clone https://github.com/EBGToo/SBBasics.git SBBasics
 ```
 
-Add the `SBBasics` Xcode Project to your Xcode Workspace.
+Add the SBBasics Xcode Project to your Xcode Workspace; you'll also need the [SBCommons](https://github.com/EBGToo/SBCommons) package
+as well

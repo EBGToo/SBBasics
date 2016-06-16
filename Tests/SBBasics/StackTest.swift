@@ -80,7 +80,7 @@ class StackTest: XCTestCase {
   }
   
   func XtestPerformanceExample() {
-    self.measureBlock() {
+    self.measure() {
     }
   }
 }

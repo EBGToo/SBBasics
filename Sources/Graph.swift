@@ -28,15 +28,15 @@ class Edge<KE:Hashable, KN:Hashable> : Hashable {
     target.addEdge (self)
   }
 
-  func hasSource (n : Node<KN, KE>) -> Bool {
+  func hasSource (_ n : Node<KN, KE>) -> Bool {
     return n === source
   }
 
-  func hasTarget (n: Node<KN, KE>) -> Bool {
+  func hasTarget (_ n: Node<KN, KE>) -> Bool {
     return n === target
   }
   
-  func hasNode (node: Node<KN, KE>) -> Bool {
+  func hasNode (_ node: Node<KN, KE>) -> Bool {
     return node === source || node === target
   }
   
@@ -45,18 +45,18 @@ class Edge<KE:Hashable, KN:Hashable> : Hashable {
   
   // unlink
   
-  func appNodes (apply : (Node<KN, KE>) -> Void) {
+  func appNodes (_ apply : (Node<KN, KE>) -> Void) {
     apply(source); apply(target)
   }
 
   //
   // Weight
   //
-  func edgeWgtEQ (that: Edge<KE,KN>) -> Bool {
+  func edgeWgtEQ (_ that: Edge<KE,KN>) -> Bool {
     return self.wgt == that.wgt
   }
   
-  func edgeWgtLT (that: Edge<KE,KN>) -> Bool {
+  func edgeWgtLT (_ that: Edge<KE,KN>) -> Bool {
     return self.wgt < that.wgt
   }
   
@@ -89,26 +89,26 @@ class Node<KN:Hashable, KE:Hashable> : Hashable {
     return 0 == edges.count
   }
   
-  func addEdge (edge : Edge<KE, KN>) {
+  func addEdge (_ edge : Edge<KE, KN>) {
     // ?? confirm edge.hasNode(self)
     edges.insert(edge)
   }
   
-  func remEdge (edge : Edge<KE, KN>) {
+  func remEdge (_ edge : Edge<KE, KN>) {
     edges.remove(edge)
   }
   
-  func hasEdge (edge : Edge<KE, KN>) -> Bool {
+  func hasEdge (_ edge : Edge<KE, KN>) -> Bool {
     return edges.contains (edge)
   }
   
-  func appEdges (apply: (Edge<KE,KN>) -> Void) {
+  func appEdges (_ apply: (Edge<KE,KN>) -> Void) {
     edges.app (apply)
   }
   
   // appAdjacentEdge
   
-  func appAdjacentNodes (apply: (Node<KN,KE>) -> Void) {
+  func appAdjacentNodes (_ apply: (Node<KN,KE>) -> Void) {
     edges.app { (edge:Edge<KE,KN>) in
       if edge.hasSource (self) {
         apply (edge.target)
@@ -154,9 +154,9 @@ public func < <KN> (lhs:PathWeight<KN>, rhs:PathWeight<KN>) -> Bool {
 }
 
 enum ShortestPathAlgorithm {
-  case Dijkstra
-  case BellmanFord
-  case Any
+  case dijkstra
+  case bellmanFord
+  case any
 }
 
 // ===========================================================================
@@ -181,12 +181,12 @@ class SearchBox<Item:Hashable> : Box<Item>, Hashable { // : Hashable {
     super.init(item:item)
   }
   
-  func kidAdd (s: SearchBox) {
+  func kidAdd (_ s: SearchBox) {
     s.parent = self
     kids.append(s)
   }
   
-  func kidApp (f: (SearchBox<Item>) -> Void) {
+  func kidApp (_ f: (SearchBox<Item>) -> Void) {
     kids.app(f)
   }
   
@@ -216,22 +216,22 @@ public class Graph<KN:Hashable, KE:Hashable> {
   
   // MARK: Node
 
-  public func hasNode (key:KN) -> Bool {
+  public func hasNode (_ key:KN) -> Bool {
     return nil != nodes[key]
   }
   
-  public func addNode (key:KN) {
+  public func addNode (_ key:KN) {
     nodes[key] = Node<KN,KE>(key: key)
   }
   
-  public func remNode (key:KN) {
+  public func remNode (_ key:KN) {
     if let _ = nodes[key] {
       /*
       node.appEdges { (edge:Edge<KE,KN>) in
         self.edges.removeValueForKey(edge.key)
       }
       */
-      nodes.removeValueForKey(key)
+      nodes.removeValue(forKey: key)
     }
   }
 
@@ -239,13 +239,13 @@ public class Graph<KN:Hashable, KE:Hashable> {
     return nodes.count
   }
   
-  public func appNodes (apply: (key:KN) -> Void) {
+  public func appNodes (_ apply: (key:KN) -> Void) {
     for (_, node): (KN, Node<KN,KE>) in nodes {
       apply (key: node.key)
     }
   }
   
-  internal func appNodesInternal (apply: (node:Node<KN,KE>) -> Void) {
+  internal func appNodesInternal (_ apply: (node:Node<KN,KE>) -> Void) {
     for (_, node): (KN, Node<KN,KE>) in nodes {
       apply (node: node)
     }
@@ -253,12 +253,12 @@ public class Graph<KN:Hashable, KE:Hashable> {
   
   // MARK: Edge
 
-  public func hasEdge (key:KE) -> Bool {
+  public func hasEdge (_ key:KE) -> Bool {
     return nil != edges[key]
   }
   
   // Deal with this... no node, no edge
-  public func addEdge (key:KE, source:KN, target:KN, weight:Double = 0.0) {
+  public func addEdge (_ key:KE, source:KN, target:KN, weight:Double = 0.0) {
     if let src = nodes[source], tgt = nodes[target] {
       let edge = Edge(key: key, source: src, target: tgt)
       edge.wgt = weight
@@ -268,11 +268,11 @@ public class Graph<KN:Hashable, KE:Hashable> {
   
   // remEdgeIntenal (used by remNode ??)
   
-  public func remEdge (key:KE) {
+  public func remEdge (_ key:KE) {
     if let edge = edges[key] {
       edge.source.remEdge(edge)
       edge.target.remEdge(edge)
-      edges.removeValueForKey(key)
+      edges.removeValue(forKey: key)
     }
   }
   
@@ -280,31 +280,31 @@ public class Graph<KN:Hashable, KE:Hashable> {
     return edges.count
   }
   
-  public func edgeSourceAndTarget (key:KE) -> (source:KN, target:KN)? {
+  public func edgeSourceAndTarget (_ key:KE) -> (source:KN, target:KN)? {
     if let edge = edges[key] {
       return (edge.source.key, edge.target.key)
     }
     return nil
   }
   
-  public func edgeWgt (key:KE) -> Double? {
+  public func edgeWgt (_ key:KE) -> Double? {
     return edges[key]?.wgt;
   }
   
-  public func appEdges (apply: (key:KE, source:KN, target:KN) -> Void) {
+  public func appEdges (_ apply: (key:KE, source:KN, target:KN) -> Void) {
     for (_, edge): (KE, Edge<KE,KN>) in edges {
       apply (key: edge.key, source: edge.source.key, target: edge.target.key)
     }
   }
 
-  internal func appEdgesInternal (apply: (edge:Edge<KE,KN>) -> Void) {
+  internal func appEdgesInternal (_ apply: (edge:Edge<KE,KN>) -> Void) {
     for (_, edge): (KE, Edge<KE,KN>) in edges {
       apply (edge: edge)
     }
   }
   
   internal var edgesSorted : [Edge<KE,KN>] {
-    return Array(edges.values).sort { (e1:Edge<KE, KN>, e2:Edge<KE, KN>) -> Bool in
+    return Array(edges.values).sorted { (e1:Edge<KE, KN>, e2:Edge<KE, KN>) -> Bool in
       e1.edgeWgtLT(e2)
     }
   }
@@ -317,14 +317,14 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter roots: The nodes to begin walking from.
   /// - parameter f: The function to apply to each visited node
   ///
-  public func walkPaths (roots: [KN], f: (List<KN> -> ())) {
+  public func walkPaths (_ roots: [KN], f: ((List<KN>) -> ())) {
     
     // Set of nodes that have been visited.
     var visited = Set<Node<KN,KE>>()
     
     // Returns TRUE if NODE needs to be visited (has not been visited in the
     // past); otherwise FALSE is returned.
-    func visit (node:Node<KN,KE>) -> Bool {
+    func visit (_ node:Node<KN,KE>) -> Bool {
       if visited.contains(node) { return false }
       else {
         visited.insert(node)
@@ -344,7 +344,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   
   // typealias walkPathVisitor = (node:Node<KN,KE>, var path: List<Node<KN,KE>>) -> Void
 
-  func walkPathsFromNode (node:Node<KN,KE>, path: List<Node<KN,KE>>,
+  func walkPathsFromNode (_ node:Node<KN,KE>, path: List<Node<KN,KE>>,
     visit: (node:Node<KN,KE>) -> Bool,
     handle: (List<KN>) -> Void) {
       
@@ -375,7 +375,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter key: The node to start from.
   /// - parameter f: The function to apply to each visited node
   ///
-  public func breadthFirstSearch (key: KN, f: ((key: KN) -> Void)) {
+  public func breadthFirstSearch (_ key: KN, f: ((key: KN) -> Void)) {
     breadthFirstSearchInternal (key,
       starter: { (node:Node<KN,KE>) in f (key: node.key) })
   }
@@ -390,7 +390,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter finisher: The function to apply when last visited
   /// - parameter rooter: The function to aply to each root.
   ///
-  public func breadthFirstSearchDetailed (key: KN,
+  public func breadthFirstSearchDetailed (_ key: KN,
     starter:  ((key: KN) -> Void)  = { (key: KN) in return },
     finisher: ((key: KN) -> Void)  = { (key: KN) in return },
     rooter:   ((key: KN) -> Void)? = nil)
@@ -401,7 +401,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
       rooter:   (nil == rooter ? nil : { (node) in rooter! (key: node.key) }))
   }
 
-  internal func breadthFirstSearchInternal (key: KN,
+  internal func breadthFirstSearchInternal (_ key: KN,
     starter:  ((node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
     finisher: ((node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
     rooter:   ((node: Node<KN,KE>) -> Void)? = nil)
@@ -416,7 +416,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
     // Map from Node to SearcherBox - holds intermediate data.
     var boxMap : [Node<KN,KE> : Box] = [:]
     
-    func visit (n: Node<KN,KE>, c: BoxColor, d: UInt, ps : Box?) {
+    func visit (_ n: Node<KN,KE>, c: BoxColor, d: UInt, ps : Box?) {
       let s = boxMap[n]!
       s.color = c
       s.d     = d
@@ -429,25 +429,25 @@ public class Graph<KN:Hashable, KE:Hashable> {
     
     var queue = Queue<Node<KN,KE>>()
     
-    func search (n: Node<KN,KE>) {
+    func search (_ n: Node<KN,KE>) {
       let ns = boxMap[n]!
       n.appAdjacentNodes { (x: Node<KN, KE>) in
         let xs = boxMap[x]!
-        if .White == xs.color {
+        if .white == xs.color {
           time += 1
-          visit (x, c: .Gray, d: time, ps: ns)
+          visit (x, c: .gray, d: time, ps: ns)
           queue.enqueue (x)
         }
       }
       
       _ = queue.dequeue().map (search)
 
-      ns.color = .Black
+      ns.color = .black
       finisher(node: n)
     }
     
     time += 1
-    visit (nodes[key]!, c: .Gray, d: time, ps: nil)
+    visit (nodes[key]!, c: .gray, d: time, ps: nil)
     search (nodes[key]!)
     
     // If provided, apply ROOTER to each root node.  Create a Set<Root> to
@@ -471,7 +471,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter key: The node to start from.
   /// - parameter f: The function to apply to each visited node
   ///
-  func depthFirstSearch (key: KN, f: ((key: KN) -> Void)) {
+  func depthFirstSearch (_ key: KN, f: ((key: KN) -> Void)) {
     if hasNode(key) {
       depthFirstSearchInternal (key,
         starter: { (node:Node<KN,KE>) in f (key: node.key) })
@@ -488,7 +488,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter finisher: The function to apply when last visited
   /// - parameter rooter: The function to aply to each root.
   ///
-  func depthFirstSearchDetailed (key: KN,
+  func depthFirstSearchDetailed (_ key: KN,
       starter:  ((key: KN) -> Void)  = { (key: KN) in return },
       finisher: ((key: KN) -> Void)  = { (key: KN) in return },
       rooter:   ((key: KN) -> Void)? = nil)
@@ -506,13 +506,13 @@ public class Graph<KN:Hashable, KE:Hashable> {
   ///
   /// - parameter f: The function to apply to each visited node.
   ///
-  func depthFirstSearchAll (f: ((key: KN) -> Void)) {
+  func depthFirstSearchAll (_ f: ((key: KN) -> Void)) {
     depthFirstSearchInternal (nil,
       starter: { (node:Node<KN,KE>) in f (key: node.key) })
   }
   
   ///
-  internal func depthFirstSearchInternal (key: KN?,
+  internal func depthFirstSearchInternal (_ key: KN?,
     starter:  ((node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
     finisher: ((node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
     rooter:   ((node: Node<KN,KE>) -> Void)? = nil)
@@ -531,7 +531,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
     // box the 'color' and 'depth' provided.  Additionally, if the parent
     // box exists we add node as a child.  Finally, we call the provided starter
     // function.
-    func visit (n: Node<KN,KE>, c: BoxColor, d: UInt, ps : Box?) {
+    func visit (_ n: Node<KN,KE>, c: BoxColor, d: UInt, ps : Box?) {
       let s = boxMap[n]!
       s.color = c
       s.d     = d
@@ -546,14 +546,14 @@ public class Graph<KN:Hashable, KE:Hashable> {
     // that depth-first search completes, we'll make the node and then call
     // the finisher function.
     
-    func search (n: Node<KN,KE>, pn: Node<KN,KE>?) {
+    func search (_ n: Node<KN,KE>, pn: Node<KN,KE>?) {
       let ns = boxMap[n]!
-      if .White == ns.color {
+      if .white == ns.color {
         time += 1
-        visit (n, c: .Gray, d: time, ps: (nil == pn ? nil : boxMap[pn!]))
+        visit (n, c: .gray, d: time, ps: (nil == pn ? nil : boxMap[pn!]))
         n.appAdjacentNodes { (c) in search (c, pn:n) }
         
-        ns.color = .Black
+        ns.color = .black
         time += 1; ns.f = time
         finisher (node: n)
       }
@@ -670,8 +670,8 @@ public class Graph<KN:Hashable, KE:Hashable> {
   ///
   /// - parameter key: The node to start from
   ///
-  public func shortestPath (key: KN) -> ShortestPathReturn {
-    return shortestPathInternal(key, algorithm: .Any)
+  public func shortestPath (_ key: KN) -> ShortestPathReturn {
+    return shortestPathInternal(key, algorithm: .any)
   }
   
   ///
@@ -679,8 +679,8 @@ public class Graph<KN:Hashable, KE:Hashable> {
   ///
   /// - parameter key: The node to start from
   ///
-  public func shortestPathDijkstra (key: KN) -> ShortestPathReturn {
-    return shortestPathInternal(key, algorithm: .Dijkstra)
+  public func shortestPathDijkstra (_ key: KN) -> ShortestPathReturn {
+    return shortestPathInternal(key, algorithm: .dijkstra)
   }
   
   ///
@@ -688,12 +688,12 @@ public class Graph<KN:Hashable, KE:Hashable> {
   ///
   /// - parameter key: The node to start from
   ///
-  public func shortestPathBellmanFord (key: KN) -> ShortestPathReturn {
-    return shortestPathInternal(key, algorithm: .BellmanFord)
+  public func shortestPathBellmanFord (_ key: KN) -> ShortestPathReturn {
+    return shortestPathInternal(key, algorithm: .bellmanFord)
   }
   
   ///
-  internal func shortestPathInternal (key: KN, algorithm: ShortestPathAlgorithm) -> ShortestPathReturn {
+  internal func shortestPathInternal (_ key: KN, algorithm: ShortestPathAlgorithm) -> ShortestPathReturn {
     if nil == nodes[key] { return [:] }
     
     var algorithm = algorithm
@@ -704,7 +704,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
     
     var paths : [KN : PathWeight<KN>] = [:]
     
-    func relax (e:Edge<KE,KN>) -> Bool {
+    func relax (_ e:Edge<KE,KN>) -> Bool {
       let pathSource = paths[e.source.key]!
       let pathTarget = paths[e.target.key]!
       
@@ -720,7 +720,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
     
     // Assume .Dijkstra as it is more general than .BellmanFord
     
-    var conformingAlgorithm : ShortestPathAlgorithm = .Dijkstra
+    var conformingAlgorithm : ShortestPathAlgorithm = .dijkstra
     
     // We are finding the shortest path - so, we'll determine the absolute
     // longest path and then minimize from that.  The weight limit must be less
@@ -731,7 +731,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
     appEdgesInternal { (edge) -> Void in
       weightLimit += abs (edge.wgt)
       if edge.wgt < 0.0 {
-        conformingAlgorithm = .BellmanFord
+        conformingAlgorithm = .bellmanFord
       }
     }
     
@@ -749,9 +749,9 @@ public class Graph<KN:Hashable, KE:Hashable> {
     paths[source.key]!.wgt = 0.0
     
     switch algorithm {
-    case .Any:
+    case .any:
       fallthrough
-    case .BellmanFord:
+    case .bellmanFord:
       // We'll relax all edges countOfNodes times (M*N)
       for _ in 0..<countOfNodes {
         appEdgesInternal{ (e) in relax (e); return }
@@ -764,7 +764,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
       }
       */
       
-    case .Dijkstra:
+    case .dijkstra:
       var heap = Heap<PathWeight<KN>>()
       
       appNodesInternal { (node) in

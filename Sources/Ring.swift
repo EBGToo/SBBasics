@@ -13,7 +13,7 @@
 public protocol RingType {
   associatedtype Item
 
-  mutating func put (item: Item)
+  mutating func put (_ item: Item)
   mutating func get () -> Item?
   var look : Item? { get }
 }
@@ -38,7 +38,7 @@ public struct Ring<E> : RingType {
     self.items = Array<Item>()
   }
   
-  public mutating func put (item: Item) {
+  public mutating func put (_ item: Item) {
     if items.count < capacity {
       items.append(item)
     }
@@ -81,13 +81,13 @@ extension Ring : BagType {
     return head == tail
   }
   
-  public func app (@noescape apply: (Item) throws -> Void) rethrows -> Void {
+  public func app (_ apply: @noescape (Item) throws -> Void) rethrows -> Void {
     for index in head ..< tail {
       try apply (items[index % capacity])
     }
   }
   
-  public func filter (@noescape includeElement: (Item) -> Bool) -> Ring<Item> {
+  public func filter ( _ includeElement: @noescape (Item) -> Bool) -> Ring<Item> {
     let array  = self.array.filter(includeElement)
     var result = Ring<Item>(capacity: array.count)
     array.forEach { result.put($0) }
@@ -102,14 +102,14 @@ extension Ring : BagType {
   
   public var list : List<Item> {
     var result = List<Item>()
-    app { result = List.Cons($0, result) }
+    app { result = List.cons($0, result) }
     return result.reverse
   }
 }
 
 
 extension Ring : OrderedBagType {
-  public func reduce<Result>(initial: Result, @noescape combine: (Result, E) -> Result) -> Result {
+  public func reduce<Result>(_ initial: Result, combine: @noescape (Result, E) -> Result) -> Result {
     var result = initial
     app { result = combine (result, $0) }
     return result

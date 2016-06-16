@@ -18,14 +18,14 @@ class ctxxTests: XCTestCase {
     super.tearDown()
   }
   
-  func mapperWith (label:String, f: (Int) -> Int) -> (Int) -> Int {
+  func mapperWith (_ label:String, f: (Int) -> Int) -> (Int) -> Int {
     return { (i:Int) in
       print ("\(label): \(i)")
       return f(i)
     }
   }
   
-  func filterWith (label:String, pred: (Int) -> Bool) -> (Int) -> Bool {
+  func filterWith (_ label:String, pred: (Int) -> Bool) -> (Int) -> Bool {
     return { (i:Int) in
       print ("\(label): \(i)")
       return pred(i)
@@ -35,7 +35,7 @@ class ctxxTests: XCTestCase {
   func testLazySequence() {
     let a1 = [1, 2, 3]
     
-    func mapper (label:String) -> (Int) -> Int {
+    func mapper (_ label:String) -> (Int) -> Int {
       return { (i:Int) in
         print ("\(label): \(i)")
         return i * 10
@@ -177,7 +177,7 @@ class ctxxTests: XCTestCase {
   }
   
   func testPerformanceExample() {
-    self.measureBlock {
+    self.measure {
     }
   }
 }

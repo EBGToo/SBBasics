@@ -96,7 +96,7 @@ class RingTest: XCTestCase {
   }
   
   func testPerformanceExample() {
-    self.measureBlock {
+    self.measure {
     }
   }
 }

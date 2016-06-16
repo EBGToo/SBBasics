@@ -126,7 +126,7 @@ class BoxTest: XCTestCase {
     
   }
   func testPerformanceExample() {
-    self.measureBlock() {
+    self.measure() {
     }
   }
 }

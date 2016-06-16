@@ -23,12 +23,12 @@ protocol StackType {
   var bottom : Item? {get }
   
   /// Push `item` onto the top of the stack.
-  mutating func push (item: Item) -> Void
+  mutating func push (_ item: Item) -> Void
   
   /// Pop and return the item on the top of the stack; if empty, return Optional.None
   mutating func pop () -> Item?
 
-  func map<U> (@noescape transform: (Item) -> U) -> Stack<U>
+  func map<U> (_ transform: @noescape(Item) -> U) -> Stack<U>
 }
 
 
@@ -69,8 +69,8 @@ public struct Stack<E> : StackType {
   public var bottom : Item? { return objs.last }
   
   /// Push `item` onto the top of the stack.
-  public mutating func push (item : Item) -> Void {
-    objs = List.Cons (item, objs)
+  public mutating func push (_ item : Item) -> Void {
+    objs = List.cons (item, objs)
   }
   
   /// Pop and return the item on the top of the stack; if empty, return Optional.None
@@ -82,7 +82,7 @@ public struct Stack<E> : StackType {
     return nil
   }
 
-  public func map<U> (@noescape transform: (Item) -> U) -> Stack<U> {
+  public func map<U> ( _ transform: @noescape(Item) -> U) -> Stack<U> {
     return Stack<U> (objs: objs.map(transform))
   }
 }
@@ -113,15 +113,15 @@ extension Stack : BagType {
     return objs.isEmpty
   }
 
-  public func app (@noescape apply: (Item) -> Void) -> Void {
+  public func app (_ apply: @noescape(Item) -> Void) -> Void {
     objs.app(apply)
   }
   
-  public func app (@noescape apply: (Item) throws -> Void) rethrows -> Void {
+  public func app (_ apply: @noescape (Item) throws -> Void) rethrows -> Void {
     try objs.app(apply)
   }
   
-  public func filter (@noescape includeElement: (Item) -> Bool) -> Stack<Item> {
+  public func filter ( _ includeElement: @noescape(Item) -> Bool) -> Stack<Item> {
     return Stack<Item> (objs: objs.filter (includeElement))
   }
   
@@ -135,7 +135,7 @@ extension Stack : BagType {
 }
 
 extension Stack where E : Equatable {
-  public func contains (item: Item) -> Bool {
+  public func contains (_ item: Item) -> Bool {
     return objs.contains (item)
   }
 }
@@ -143,7 +143,7 @@ extension Stack where E : Equatable {
 // MARK: Stack as OrderedBagType
 
 extension Stack : OrderedBagType {
-  public func reduce<Result>(initial: Result, @noescape combine: (Result, E) -> Result) -> Result {
+  public func reduce<Result>(_ initial: Result, combine: @noescape(Result, E) -> Result) -> Result {
     return objs.foldl (initial, combine: combine)
   }
 }

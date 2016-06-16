@@ -27,19 +27,19 @@ public protocol LazyListType : ListBaseType {
 /// A LazyListType extension to ...
 ///
 extension LazyListType {
-  func filter(predicate: (Self.Item) -> Bool) -> LazyFilterList<Self> {
+  func filter(_ predicate: (Self.Item) -> Bool) -> LazyFilterList<Self> {
     return LazyFilterList (base : self, filter : predicate)
   }
   
-  func map<U>(transform: (Self.Item) -> U) -> LazyMapList<Self, U> {
+  func map<U>(_ transform: (Self.Item) -> U) -> LazyMapList<Self, U> {
     return LazyMapList (base : self, transform: transform)
   }
   
-  func drop(n:Int) -> LazyDropList<Self> {
+  func drop(_ n:Int) -> LazyDropList<Self> {
     return LazyDropList (base: self, count: n)
   }
   
-  func take(n:Int) -> LazyTakeList<Self> {
+  func take(_ n:Int) -> LazyTakeList<Self> {
     return LazyTakeList (base: self, count: n)
   }
   
@@ -47,7 +47,7 @@ extension LazyListType {
 //    return LazyList(base: base.reverse())
   //  }
   
-  func app (@noescape apply: (Item) -> ()) {
+  func app ( _ apply: @noescape (Item) -> ()) {
     var list = self
     while let elt = list.car {
       apply (elt)
@@ -56,7 +56,7 @@ extension LazyListType {
   }
   
   public var list : List<Item> {
-    var result = List<Item>.Nil
+    var result = List<Item>.nil
     app { result = List<Item>($0, result) }
     return result.reverse
   }

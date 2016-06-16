@@ -184,7 +184,7 @@ class HeapTest: XCTestCase {
   
   
   func XtestPerformanceExample() {
-    self.measureBlock() {
+    self.measure() {
     }
   }
 }

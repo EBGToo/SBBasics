@@ -42,28 +42,28 @@ public protocol TreeType { // BagType
   ///    - item: The item 
   ///    - pred: The test for item
   ///
-  func depth (item: Item, pred: (Item, Item) -> Bool) -> Int?
+  func depth (_ item: Item, pred: (Item, Item) -> Bool) -> Int?
   
   /// The parent of item if found based on `pred`
-  func parent (item: Item, pred: (Item, Item) -> Bool) -> Self?
+  func parent (_ item: Item, pred: (Item, Item) -> Bool) -> Self?
   
   /// Check if `item`, based on `pred`, exists
-  func contains (item: Item, pred: (Item, Item) -> Bool) -> Bool
+  func contains (_ item: Item, pred: (Item, Item) -> Bool) -> Bool
 
-  func walkByDepth (preOrder preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?)
+  func walkByDepth (preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?)
   
-  func walkByBreadth (preOrder preOrder: Visitor?, postOrder: Visitor?)
+  func walkByBreadth (preOrder: Visitor?, postOrder: Visitor?)
   
   /// All items
   var array : Array<Item> { get }
 }
 
 extension TreeType {
-  func walkByDepth (inOrder: Visitor) {
+  func walkByDepth (_ inOrder: Visitor) {
     walkByDepth(preOrder: nil, inOrder: inOrder, postOrder: nil)
   }
   
-  func walkByBreadth(preOrder: Visitor) {
+  func walkByBreadth(_ preOrder: Visitor) {
     walkByBreadth(preOrder: preOrder, postOrder: nil)
   }
 
@@ -75,7 +75,7 @@ extension TreeType {
 }
 
 extension TreeType where Item:Equatable {
-  func contains (item:Item) -> Bool {
+  func contains (_ item:Item) -> Bool {
     return contains (item, pred:==)
   }
 }
@@ -124,7 +124,7 @@ public struct Tree<T> : TreeType {
     return kids.isEmpty ? 0 : (1 + kids.map { $0.height }.reduce (Int.min, combine: max))
   }
   
-  public func depth (item: Item, pred: (Item, Item) -> Bool) -> Int? {
+  public func depth (_ item: Item, pred: (Item, Item) -> Bool) -> Int? {
     if pred (self.item, item) { return 0 }
     
     let result = kids.flatMap { $0.depth (item, pred: pred) }
@@ -134,22 +134,22 @@ public struct Tree<T> : TreeType {
   }
   
   /// The parent of item if found based on `pred`
-  public func parent (item: Item, pred: (Item, Item) -> Bool) -> Tree? {
+  public func parent (_ item: Item, pred: (Item, Item) -> Bool) -> Tree? {
     if kids.any ({ pred ($0.item, item) }) { return self }
     else {
       return kids.flatMap { $0.parent (item, pred: pred) }.first
     }
   }
   
-  public func contains (item: Item, pred: (Item, Item) -> Bool) -> Bool {
+  public func contains (_ item: Item, pred: (Item, Item) -> Bool) -> Bool {
     return pred (self.item, item) || kids.any { $0.contains (item, pred: pred) }
   }
 
   ///
-  public func walkByBreadth(preOrder preOrder: Visitor?, postOrder: Visitor?) {
+  public func walkByBreadth(preOrder: Visitor?, postOrder: Visitor?) {
     var queue = Queue<Tree<Item>>()
 
-    func walk (tree:Tree<Item>) {
+    func walk (_ tree:Tree<Item>) {
       preOrder? (tree.item)
 
       tree.kids.forEach {
@@ -165,8 +165,8 @@ public struct Tree<T> : TreeType {
   }
   
   ///
-  public func walkByDepth (preOrder preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?) {
-    func rwalk (t: Tree<Item>) {
+  public func walkByDepth (preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?) {
+    func rwalk (_ t: Tree<Item>) {
       t.walkByDepth (preOrder: preOrder, inOrder: inOrder, postOrder: postOrder)
     }
 
@@ -186,7 +186,7 @@ public struct Tree<T> : TreeType {
     //return kids.map { $0.items }.reduce([item]) { $0.appendContentsOf($1) }
 
     var result = [item]
-    kids.map { $0.array }.forEach { result.appendContentsOf($0) }
+    kids.map { $0.array }.forEach { result.append(contentsOf: $0) }
     return result
   }
 }
@@ -208,15 +208,15 @@ public protocol BinaryTreeType : TreeType { //OrderedBagType
   var right : Self? { get }
   
   /// Check if `item` is contained
-  func contains (item: Item) -> Bool
+  func contains (_ item: Item) -> Bool
   
   /// Depth (number of parents) to `item` (if it exists), otherwise nil
-  func depth (item: Item) -> Int?
+  func depth (_ item: Item) -> Int?
  
   // Restore: Self -> BinaryTree<Item>
   
   /// The parent of `item` (if it exists), otherwise nil
-  func parent (item: Item) -> Self?
+  func parent (_ item: Item) -> Self?
  
   /// The subtree (kidless, leaf) to the left
   var minimum : Self { get }
@@ -225,19 +225,19 @@ public protocol BinaryTreeType : TreeType { //OrderedBagType
   var maximum : Self { get }
 
   /// The successor to `item` (if it exists), otherwise nil
-  func successor (item: Item) -> Self?
+  func successor (_ item: Item) -> Self?
   
   /// The predecessor to `item` (if it exists), otherwise nil
-  func predecessor (item: Item) -> Self?
+  func predecessor (_ item: Item) -> Self?
 }
 
 // MARK: Binary Tree
 
 /// A `Color` is used to balance a binary tree: Red and Black
-public enum Color { case R, B }
+public enum Color { case r, b }
 
 /// A `Order` defines a sub-search order; under .Breadth or .Depth
-public enum Order { case PreOrder, InOrder, PostOrder }
+public enum Order { case preOrder, inOrder, postOrder }
 
 ///
 /// A BinaryTree is an ordered set of Items
@@ -245,23 +245,23 @@ public enum Order { case PreOrder, InOrder, PostOrder }
 public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   
   // Resursive Base - this is not exposed in a public interface (except this type itself)
-  case Empty
+  case empty
   
   // Recursive Tree - Note: a `leaf` is .Node (_, .Empty, _, .Empty)
-  indirect case Node(Color, BinaryTree<Item>, Item, BinaryTree<Item>)
+  indirect case node(Color, BinaryTree<Item>, Item, BinaryTree<Item>)
   
   public typealias Visitor = (Item) -> Void
   
   private init () {
-    self = .Empty
+    self = .empty
   }
   
   private init(item: Item,
-    color: Color = .B,
-    left : BinaryTree<Item> = .Empty,
-    right: BinaryTree<Item> = .Empty)
+    color: Color = .b,
+    left : BinaryTree<Item> = .empty,
+    right: BinaryTree<Item> = .empty)
   {
-    self = .Node(color, left, item, right)
+    self = .node(color, left, item, right)
   }
   
   /// Initialize an instance as a `Leaf` with `item`
@@ -272,37 +272,37 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// Initialize an instance with `items`
   init (items: Array<Item>) {
     // By doing this, for a random array of N ~= 1000, speed up by x20
-    var items = items.sort()
+    var items = items.sorted()
 
-    func recolor (color: Color) -> Color {
+    func recolor (_ color: Color) -> Color {
       switch color {
-      case .R: return .B
-      case .B: return .R
+      case .r: return .b
+      case .b: return .r
       }
     }
     
-    func split (color: Color, _ items: ArraySlice<Item>) -> BinaryTree<Item> {
+    func split (_ color: Color, _ items: ArraySlice<Item>) -> BinaryTree<Item> {
       let xolor = recolor (color)
 
       switch items.count {
-      case 0: return .Empty
+      case 0: return .empty
       case 1:
         let item = items[items.startIndex]
 
-        return .Node(color, .Empty, item, .Empty)
+        return .node(color, .empty, item, .empty)
 
       case 2:
         let litem = items[items.startIndex]
         let hitem = items[items.startIndex + 1]
 
-        return .Node(color, .Empty, litem, .Node(xolor, .Empty, hitem, .Empty))
+        return .node(color, .empty, litem, .node(xolor, .empty, hitem, .empty))
         
       case 3:
         let litem = items[items.startIndex]
         let mitem = items[items.startIndex + 1]
         let hitem = items[items.startIndex + 2]
 
-        return .Node(color, .Node(xolor, .Empty, litem, .Empty), mitem, .Node(xolor, .Empty, hitem, .Empty))
+        return .node(color, .node(xolor, .empty, litem, .empty), mitem, .node(xolor, .empty, hitem, .empty))
 
       default:
         let ldex = items.startIndex
@@ -312,11 +312,11 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
         let ltree = split (xolor, items[ldex..<mdex])
         let rtree = split (xolor, items[(mdex + 1)..<edex])
 
-        return .Node(color, ltree, items[mdex], rtree)
+        return .node(color, ltree, items[mdex], rtree)
       }
     }
     
-    self = split (.B, items[0..<items.count])
+    self = split (.b, items[0..<items.count])
   }
   
   @noreturn
@@ -327,45 +327,45 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// The `item`
   public var item : Item {
     switch self {
-    case Empty: unexpectedEmpty()
-    case let Node (_, _, item, _): return item
+    case empty: unexpectedEmpty()
+    case let node (_, _, item, _): return item
     }
   }
   
   /// The `left` subtree otherwise `nil`
   public var left : BinaryTree<Item>? {
     switch self {
-    case .Node (_, .Empty, _, _): return nil
-    case .Node (_, let l , _, _): return l
-    case .Empty: unexpectedEmpty()
+    case .node (_, .empty, _, _): return nil
+    case .node (_, let l , _, _): return l
+    case .empty: unexpectedEmpty()
     }
   }
   
   /// The `right` subtree, otherwise `nil`
   public var right : BinaryTree<Item>? {
     switch self {
-    case .Node (_, _, _, .Empty): return nil
-    case .Node (_, _, _, let r ): return r
-    case .Empty: unexpectedEmpty()
+    case .node (_, _, _, .empty): return nil
+    case .node (_, _, _, let r ): return r
+    case .empty: unexpectedEmpty()
     }
   }
   
   /// The `kids` - composed of `left` and `right` nodes, that exist.
   public var kids : Array<BinaryTree<Item>> {
     switch self {
-    case .Node(_, .Empty, _, .Empty): return []
-    case let .Node (_, .Empty, _, r): return [r]
-    case let .Node (_, l, _, .Empty): return [l]
-    case let .Node (_, l, _, r): return [l, r]
-    case .Empty: unexpectedEmpty()
+    case .node(_, .empty, _, .empty): return []
+    case let .node (_, .empty, _, r): return [r]
+    case let .node (_, l, _, .empty): return [l]
+    case let .node (_, l, _, r): return [l, r]
+    case .empty: unexpectedEmpty()
     }
   }
 
   /// `true` if no `kids`; otherwise `false` - aka `isLeaf`
   public var isKidless : Bool {
     switch self {
-    case .Empty: unexpectedEmpty()
-    case .Node (_, .Empty, _, .Empty): return true
+    case .empty: unexpectedEmpty()
+    case .node (_, .empty, _, .empty): return true
     default: return false
     }
   }
@@ -373,9 +373,9 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// The number of kids
   public var degree : Int {
     switch self {
-    case .Empty: unexpectedEmpty()
-    case .Node (_, .Empty, _, .Empty): return 0
-    case .Node (_, .Node,  _, .Node ): return 2
+    case .empty: unexpectedEmpty()
+    case .node (_, .empty, _, .empty): return 0
+    case .node (_, .node,  _, .node ): return 2
     default: return 1
     }
   }
@@ -383,8 +383,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// The number of descendents (includes self)
   public var count : Int {
     switch self {
-    case Empty: return 0
-    case let Node (_, l, _, r):
+    case empty: return 0
+    case let node (_, l, _, r):
       return 1 + l.count + r.count
     }
   }
@@ -392,8 +392,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// The longest count of descendents along any path.  A leaf (no kids) has a height of zero
   public var height : Int {
     switch self {
-    case Empty: return -1
-    case let Node (_, l, _, r):
+    case empty: return -1
+    case let node (_, l, _, r):
       return 1 + max (l.height, r.height)
     }
   }
@@ -406,46 +406,46 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   ///    - item: The item
   ///    - pred: The test for item
   ///
-  public func depth(item: Item, pred: (Item, Item) -> Bool) -> Int? {
+  public func depth(_ item: Item, pred: (Item, Item) -> Bool) -> Int? {
     switch self {
-    case let .Node (_, .Node(_, _, that, _), _, _)  where pred (that, item): return 1
-    case let .Node (_, _, _, .Node (_, _, that, _)) where pred (that, item): return 1
-    case let .Node (_, l, that, r):
+    case let .node (_, .node(_, _, that, _), _, _)  where pred (that, item): return 1
+    case let .node (_, _, _, .node (_, _, that, _)) where pred (that, item): return 1
+    case let .node (_, l, that, r):
       // Caution on `pred` implies `==` but isn't `==`
       if item < that { return l.depth (item, pred: pred).map { 1 + $0 } }
       if item > that { return r.depth (item, pred: pred).map { 1 + $0 } }
       return 0
-    case .Empty: unexpectedEmpty()
+    case .empty: unexpectedEmpty()
     }
   }
   
   /// The parent of item if found based on `pred`
-  public func parent (item: Item, pred: (Item, Item) -> Bool) -> BinaryTree<Item>? {
+  public func parent (_ item: Item, pred: (Item, Item) -> Bool) -> BinaryTree<Item>? {
     switch self {
-    case let .Node (_, _, this, _) where pred (this, item): return nil
-    case let .Node (_, .Node(_, _, that, _), _, _)  where pred (that, item): return self
-    case let .Node (_, _, _, .Node (_, _, that, _)) where pred (that, item): return self
-    case let .Node (_, l, _, r):
+    case let .node (_, _, this, _) where pred (this, item): return nil
+    case let .node (_, .node(_, _, that, _), _, _)  where pred (that, item): return self
+    case let .node (_, _, _, .node (_, _, that, _)) where pred (that, item): return self
+    case let .node (_, l, _, r):
       return l.parent (item) ?? r.parent (item)
-    case .Empty: unexpectedEmpty()
+    case .empty: unexpectedEmpty()
     }
   }
 
   /// Check if `item`, based on `pred`, exists
-  public func contains(item: Item, pred: (Item, Item) -> Bool) -> Bool {
+  public func contains(_ item: Item, pred: (Item, Item) -> Bool) -> Bool {
     switch self {
-    case .Empty: return false
-    case let .Node (_, l, that, r):
+    case .empty: return false
+    case let .node (_, l, that, r):
       return pred (that, item)
         || l.contains (item, pred: pred)
         || r.contains (item, pred: pred)
     }
   }
 
-  public func walkByBreadth(preOrder preOrder: Visitor?, postOrder: Visitor?) {
+  public func walkByBreadth(preOrder: Visitor?, postOrder: Visitor?) {
     var queue = Queue<BinaryTree<Item>>()
     
-    func walk (tree:BinaryTree<Item>) {
+    func walk (_ tree:BinaryTree<Item>) {
       preOrder? (tree.item)
       
       tree.kids.forEach {
@@ -461,14 +461,14 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   }
   
   ///
-  public func walkByDepth (preOrder preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?) {
-    func rwalk (t: BinaryTree<Item>) {
+  public func walkByDepth (preOrder: Visitor?, inOrder: Visitor?, postOrder: Visitor?) {
+    func rwalk (_ t: BinaryTree<Item>) {
       t.walkByDepth (preOrder: preOrder, inOrder: inOrder, postOrder: postOrder)
     }
 
     switch self {
-    case .Empty: return
-    case let Node (_, l, item, r):
+    case .empty: return
+    case let node (_, l, item, r):
       preOrder?(item)
       rwalk(l)
       inOrder? (item)
@@ -480,8 +480,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// All items
   public var array : [Item] {
     var result = [item]
-    if let l = left  { result.appendContentsOf(l.array) }
-    if let r = right { result.appendContentsOf(r.array) }
+    if let l = left  { result.append(contentsOf: l.array) }
+    if let r = right { result.append(contentsOf: r.array) }
     return result
   }
   
@@ -490,15 +490,15 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   //
   
   /// Check if `item` is contained
-  public func contains(item: Item) -> Bool {
+  public func contains(_ item: Item) -> Bool {
     return nil != lookup(item)
   }
   
   /// Depth (number of parents) to `item` (if it exists), otherwise nil
-  public func depth (item: Item) -> Int? {
+  public func depth (_ item: Item) -> Int? {
     switch self {
-    case .Empty: return nil
-    case let .Node(_, l, that, r):
+    case .empty: return nil
+    case let .node(_, l, that, r):
       if item < that { return l.depth (item).map { 1 + $0 } }
       if item > that { return r.depth (item).map { 1 + $0 } }
       return 0
@@ -506,12 +506,12 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   }
   
   /// The parent of `item` (if it exists), otherwise nil
-  public func parent (item: Item) -> BinaryTree<Item>? {
+  public func parent (_ item: Item) -> BinaryTree<Item>? {
     switch self {
-    case .Empty: return nil
-    case let .Node (_, .Node(_, _, that, _), _, _)  where that == item: return self
-    case let .Node (_, _, _, .Node (_, _, that, _)) where that == item: return self
-    case let .Node (_, l, that, r):
+    case .empty: return nil
+    case let .node (_, .node(_, _, that, _), _, _)  where that == item: return self
+    case let .node (_, _, _, .node (_, _, that, _)) where that == item: return self
+    case let .node (_, l, that, r):
       if item < that { return l.parent (item) }
       if item > that { return r.parent (item) }
       return nil
@@ -521,25 +521,25 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// The subtree (kidless, leaf) to the left
   public var minimum : BinaryTree<Item> {
     switch self {
-    case .Node (_, .Empty, _, _): return self
-    case .Node (_, let l,  _, _): return l.minimum
-    case .Empty: unexpectedEmpty()
+    case .node (_, .empty, _, _): return self
+    case .node (_, let l,  _, _): return l.minimum
+    case .empty: unexpectedEmpty()
     }
   }
   
   /// The subtree (kidless, leaf) to the right
   public var maximum : BinaryTree<Item> {
     switch self {
-    case .Node (_, _, _, .Empty): return self
-    case .Node (_, _, _, let r ): return r.maximum
-    case .Empty: unexpectedEmpty()
+    case .node (_, _, _, .empty): return self
+    case .node (_, _, _, let r ): return r.maximum
+    case .empty: unexpectedEmpty()
     }
   }
 
-  func lookup (item: Item) -> BinaryTree<Item>? {
+  func lookup (_ item: Item) -> BinaryTree<Item>? {
     switch self {
-    case .Empty: return nil
-    case let .Node(_, l, that, r):
+    case .empty: return nil
+    case let .node(_, l, that, r):
       if item < that { return l.lookup (item) }
       if item > that { return r.lookup (item) }
       return self
@@ -548,49 +548,49 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   
   private typealias Box = BinaryTree<Item>
   
-  private func lookup (item: Item, path: List<Box>, done: (path: List<Box>) -> Box?) -> Box? {
+  private func lookup (_ item: Item, path: List<Box>, done: (path: List<Box>) -> Box?) -> Box? {
     switch self {
-    case let .Node (_, l, that, r):
+    case let .node (_, l, that, r):
       if item < that { return l.lookup (item, path: List<Box>(self, path), done: done) }
       if item > that { return r.lookup (item, path: List<Box>(self, path), done: done) }
       return done (path: List<Box>(self, path))
-    case .Empty: return done (path: List<Box>.Nil)
+    case .empty: return done (path: List<Box>.nil)
     }
   }
 
-  private func upRight (path: List<Box>) -> Box? {
+  private func upRight (_ path: List<Box>) -> Box? {
     guard let parent = path.car else { return nil }
     if parent.right?.item == item { return parent }
     else { return parent.upRight (path.cdr!) }
   }
 
-  private func upLeft (path: List<Box>) -> Box? {
+  private func upLeft (_ path: List<Box>) -> Box? {
     guard let parent = path.car else { return nil }
     if parent.left?.item == item { return parent }
     else { return parent.upLeft (path.cdr!) }
   }
   
-  public func predecessor (item: Item) -> BinaryTree<Item>? {
-    return lookup (item, path: .Nil) { (path:List<Box>) -> Box? in
-      guard case let .Cons(box, rest) = path else { return nil } // Item not found
+  public func predecessor (_ item: Item) -> BinaryTree<Item>? {
+    return lookup (item, path: .nil) { (path:List<Box>) -> Box? in
+      guard case let .cons(box, rest) = path else { return nil } // Item not found
       return box.left?.maximum ?? box.upRight(rest)
     }
   }
   
-  public func successor (item: Item) -> BinaryTree<Item>? {
-    return lookup (item, path: .Nil) { (path:List<Box>) -> Box? in
-      guard case let .Cons(box, rest) = path else { return nil } // Item not found
+  public func successor (_ item: Item) -> BinaryTree<Item>? {
+    return lookup (item, path: .nil) { (path:List<Box>) -> Box? in
+      guard case let .cons(box, rest) = path else { return nil } // Item not found
       return box.right?.minimum ?? box.upLeft(rest)
     }
   }
     
   // MARK: Insert
   
-  public func insertNew (item: Item) -> BinaryTree<Item> {
-    func ins (this: BinaryTree<Item>, _ item: Item) -> BinaryTree<Item> {
+  public func insertNew (_ item: Item) -> BinaryTree<Item> {
+    func ins (_ this: BinaryTree<Item>, _ item: Item) -> BinaryTree<Item> {
       switch this {
-      case Empty: return BinaryTree (item: item, color: .R)
-      case let Node (color, left, that, right):
+      case empty: return BinaryTree (item: item, color: .r)
+      case let node (color, left, that, right):
         if item < that { return BinaryTree (item: that, color: color, left: ins(left, item), right: right).balance() }
         if item > that { return BinaryTree (item: that, color: color, left: left, right: ins(right, item)).balance() }
         return self
@@ -598,29 +598,29 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
     }
     
     switch ins (self, item) {
-    case Empty: fatalError ("impossible")
-    case let Node (_, left, item, right):
-      return .Node(.B, left, item, right)
+    case empty: fatalError ("impossible")
+    case let node (_, left, item, right):
+      return .node(.b, left, item, right)
     }
   }
   
-  public mutating func insert (item: Item) {
+  public mutating func insert (_ item: Item) {
     self = insertNew (item)
   }
   
   private func balance() -> BinaryTree<Item> {
     switch self {
-    case let .Node(.B, .Node(.R, .Node(.R, a, x, b), y, c), z, d):
-      return .Node(.R, .Node(.B,a,x,b), y, .Node(.B,c,z,d))
+    case let .node(.b, .node(.r, .node(.r, a, x, b), y, c), z, d):
+      return .node(.r, .node(.b,a,x,b), y, .node(.b,c,z,d))
       
-    case let .Node(.B, .Node(.R, a, x, .Node(.R, b, y, c)), z, d):
-      return .Node(.R, .Node(.B,a,x,b), y, .Node(.B,c,z,d))
+    case let .node(.b, .node(.r, a, x, .node(.r, b, y, c)), z, d):
+      return .node(.r, .node(.b,a,x,b), y, .node(.b,c,z,d))
       
-    case let .Node(.B, a, x, .Node(.R, .Node(.R, b, y, c), z, d)):
-      return .Node(.R, .Node(.B,a,x,b), y, .Node(.B,c,z,d))
+    case let .node(.b, a, x, .node(.r, .node(.r, b, y, c), z, d)):
+      return .node(.r, .node(.b,a,x,b), y, .node(.b,c,z,d))
       
-    case let .Node(.B, a, x, .Node(.R, b, y, .Node(.R, c, z, d))):
-      return .Node(.R, .Node(.B,a,x,b), y, .Node(.B,c,z,d))
+    case let .node(.b, a, x, .node(.r, b, y, .node(.r, c, z, d))):
+      return .node(.r, .node(.b,a,x,b), y, .node(.b,c,z,d))
       
     default:
       return self
@@ -629,59 +629,59 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   
   // MARK: Delete
 
-  public func deleteNew (item: Item) -> BinaryTree<Item> {
+  public func deleteNew (_ item: Item) -> BinaryTree<Item> {
     switch self {
-    case .Empty: return .Empty
+    case .empty: return .empty
       
       // Right That Leaf
-    case let .Node (pc, pl, pi, .Node (_, .Empty, that, .Empty)) where that == item:
-      return .Node (pc, pl, pi, .Empty)
+    case let .node (pc, pl, pi, .node (_, .empty, that, .empty)) where that == item:
+      return .node (pc, pl, pi, .empty)
 
       // Left That Leaf
-    case let .Node (pc, .Node (_, .Empty, that, .Empty), pi, pr) where that == item:
-      return .Node (pc, .Empty, pi, pr)
+    case let .node (pc, .node (_, .empty, that, .empty), pi, pr) where that == item:
+      return .node (pc, .empty, pi, pr)
 
       // Right That w/ Left Only
-    case let .Node (pc, pl, pi, .Node (_, tl, that, .Empty)) where that == item:
-      return .Node (pc, pl, pi, tl)
+    case let .node (pc, pl, pi, .node (_, tl, that, .empty)) where that == item:
+      return .node (pc, pl, pi, tl)
       
       // Right That w/ Right Only
-    case let .Node (pc, pl, pi, .Node (_, .Empty, that, tr)) where that == item:
-      return .Node (pc, pl, pi, tr)
+    case let .node (pc, pl, pi, .node (_, .empty, that, tr)) where that == item:
+      return .node (pc, pl, pi, tr)
 
       // Left That w/ Left Only
-    case let .Node (pc, .Node (_, tl, that, .Empty), pi, pr) where that == item:
-      return .Node (pc, tl, pi, pr)
+    case let .node (pc, .node (_, tl, that, .empty), pi, pr) where that == item:
+      return .node (pc, tl, pi, pr)
 
       // Left That w/ Right Only
-    case let .Node (pc, .Node (_, .Empty, that, tr), pi, pr) where that == item:
-      return .Node (pc, tr, pi, pr)
+    case let .node (pc, .node (_, .empty, that, tr), pi, pr) where that == item:
+      return .node (pc, tr, pi, pr)
 
       // Left That w/ Left and Right
-    case let .Node (pc, pl, pi, .Node (tc, tl, that, tr)) where that == item:
+    case let .node (pc, pl, pi, .node (tc, tl, that, tr)) where that == item:
       let succ = tr.minimum.item
-      return .Node (pc, pl, pi, .Node (tc, tl, succ, tr.deleteNew(succ))) // rebalance if tr.minimum .B
+      return .node (pc, pl, pi, .node (tc, tl, succ, tr.deleteNew(succ))) // rebalance if tr.minimum .B
 
       // Right That w/ Left and Right
-    case let .Node (pc, .Node (tc, tl, that, tr), pi, pr) where that == item:
+    case let .node (pc, .node (tc, tl, that, tr), pi, pr) where that == item:
       let succ = tr.minimum.item
-      return .Node (pc, .Node (tc, tl, succ, tr.deleteNew(succ)), pi, pr) // rebalance if tr.minimum .B
+      return .node (pc, .node (tc, tl, succ, tr.deleteNew(succ)), pi, pr) // rebalance if tr.minimum .B
 
       // Self That w/ Left Only
-    case let .Node (_, l, that, .Empty) where that == item:
+    case let .node (_, l, that, .empty) where that == item:
       return l
 
       // Self That w/ Left and Right
-    case let Node (c, l, that, r):
+    case let node (c, l, that, r):
       if item < that { return BinaryTree (item: that, color: c, left: l.deleteNew(item), right: r) }
       if item > that { return BinaryTree (item: that, color: c, left: l, right: r.deleteNew(item)) }
 
       let succ = r.minimum.item // r exists
-      return .Node (c, l, succ, r.deleteNew (succ))
+      return .node (c, l, succ, r.deleteNew (succ))
     }
   }
   
-  public mutating func delete (item: Item) {
+  public mutating func delete (_ item: Item) {
     self = deleteNew (item)
   }
 }

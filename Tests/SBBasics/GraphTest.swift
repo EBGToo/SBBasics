@@ -41,7 +41,7 @@ class GraphTest: XCTestCase {
     
     pathCount = 0
     g1.walkPaths ([1]) { (path: List<Int>) in
-      pathCount++
+      pathCount += 1
       XCTAssertTrue(path.contains(1), "path: 1")
       XCTAssertTrue(path.contains(2), "path: 2")
       XCTAssertFalse(path.contains(3), "path: 0")
@@ -60,7 +60,7 @@ class GraphTest: XCTestCase {
     
     pathCount = 0
     g1.walkPaths ([1]) { (path: List<Int>) in
-      pathCount++
+      pathCount += 1
       XCTAssertNotNil(path.contains(1), "path: 1")
       //      XCTAssertTrue(path.has(1, pred: ==), "path: 1")
       XCTAssertTrue(path.contains (2) || path.contains(3), "path: 2/3")
@@ -116,16 +116,16 @@ class GraphTest: XCTestCase {
     
     print("==== Topological Sort: " + result.description)
     
-    func finder (r:[String]) -> (String) -> Array<String>.Index {
+    func finder (_ r:[String]) -> (String) -> Array<String>.Index {
       return { (s:String) -> Array<String>.Index in
-        return r.indexOf(s)!
+        return r.index(of: s)!
       }
     }
 
     let lu = finder(result)
     
     nodes.app { (n:String) in
-      XCTAssertNotNil(result.indexOf(n), "missed: " + n)
+      XCTAssertNotNil(result.index(of: n), "missed: " + n)
       return
     }
     
@@ -185,7 +185,7 @@ class GraphTest: XCTestCase {
   }
   
   func testPerformanceExample() {
-    self.measureBlock() {
+    self.measure() {
     }
   }
 }

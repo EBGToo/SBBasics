@@ -24,11 +24,11 @@ protocol HeapType {
   mutating func extract () -> Item?
   
   /// Insert the provided element into the heap
-  mutating func insert (item:Item)
+  mutating func insert (_ item:Item)
   
   /// Remove the provided element from the heap.  If it exists, one and only
   /// one element is removed.
-  mutating func remove (item: Item)
+  mutating func remove (_ item: Item)
 
   /// 
   /// Remove one and only one item, the first one found, where `predicate` is true.  If an item was
@@ -38,7 +38,7 @@ protocol HeapType {
   ///
   /// - returns: `true` iff removed
   ///
-  mutating func removeIf (@noescape predicate: (Item) -> Bool) -> Bool
+  mutating func removeIf ( _ predicate: @noescape (Item) -> Bool) -> Bool
    
   /// Reheapify assuming the comparability of `item` changed.  This can't possibly work if the 
   /// Item's `Equatable` property changed and is now equal to another item's property.  The 
@@ -49,7 +49,7 @@ protocol HeapType {
   /// 
   /// Perhaps need to reheap all matches of 'Item' ... if possible
   ///
-  mutating func reheap (item: Item)
+  mutating func reheap (_ item: Item)
   
   ///
   /// Reheap one and only one item, the first one found, where `predicate` is true.  Reheap is
@@ -59,14 +59,14 @@ protocol HeapType {
   ///
   /// - parameter predicate: The predicate to determine which item to reheap.
   ///
-  mutating func reheapIf (@noescape predicate: (Item) -> Bool)
+  mutating func reheapIf ( _ predicate: @noescape (Item) -> Bool)
 
   ///
   /// Check if heap contains `Item` based on `predicate`.
   ///
   /// - parameter predicate: The predicate to identify items.
   ///
-  func containsIf (@noescape predicate: (Item) -> Bool) -> Bool
+  func containsIf ( _ predicate: @noescape (Item) -> Bool) -> Bool
 }
 
 // MARK: - Heap
@@ -108,9 +108,9 @@ public struct Heap <E:Comparable> : HeapType {
   // i=2, p=0, l=5, r=6
   // i=3, p=1, l=7, r=8
 
-  private func hp (i:Int) -> Int { return (i  - 1) >> 1 }  // parent
-  private func hl (i:Int) -> Int { return (i << 1)  + 1 }  // left
-  private func hr (i:Int) -> Int { return (i << 1)  + 2 }  // right
+  private func hp (_ i:Int) -> Int { return (i  - 1) >> 1 }  // parent
+  private func hl (_ i:Int) -> Int { return (i << 1)  + 1 }  // left
+  private func hr (_ i:Int) -> Int { return (i << 1)  + 2 }  // right
   
   // Protocol HeapType
   
@@ -118,7 +118,7 @@ public struct Heap <E:Comparable> : HeapType {
     return objs.first
   }
   
-  private mutating func heaping (c:Int, _ s:Int) {
+  private mutating func heaping (_ c:Int, _ s:Int) {
     let l = hl (c)
     let r = hr (c)
     var b = c
@@ -132,7 +132,7 @@ public struct Heap <E:Comparable> : HeapType {
     }
   }
   
-  private mutating func reheaping (index: Int) {
+  private mutating func reheaping (_ index: Int) {
     let item = objs.removeLast();
     if index < objs.count {
       objs[index] = item
@@ -148,14 +148,14 @@ public struct Heap <E:Comparable> : HeapType {
     return nil
   }
   
-  public mutating func remove (item : Item) {
-    if let index = objs.indexOf (item) {
+  public mutating func remove (_ item : Item) {
+    if let index = objs.index (of: item) {
       reheaping (index)
     }
   }
 
-  public mutating func removeIf (@noescape predicate: (Item) -> Bool) -> Bool {
-    if let index = objs.indexOf (predicate) {
+  public mutating func removeIf ( _ predicate: @noescape (Item) -> Bool) -> Bool {
+    if let index = objs.index (where: predicate) {
       reheaping (index)
       return true
     }
@@ -165,26 +165,26 @@ public struct Heap <E:Comparable> : HeapType {
   // Can this possibly work if the heap has identical items?  What if the first one found is
   // not the one with the changed comparable?  Than we move/leave the wrong item and ignore the
   // changed item.
-  public mutating func reheap (item: Item) {
-    if let index = objs.indexOf (item) {
+  public mutating func reheap (_ item: Item) {
+    if let index = objs.index (of: item) {
       reheaping (index)
       insert (item)
     }
   }
   
-  public mutating func reheapIf(@noescape predicate: (Item) -> Bool) {
-    if let index = objs.indexOf(predicate) {
+  public mutating func reheapIf( _ predicate: @noescape (Item) -> Bool) {
+    if let index = objs.index(where: predicate) {
       let item = objs[index]
       reheaping(index)
       insert (item)
     }
   }
   
-  public func containsIf (@noescape predicate: (Item) -> Bool) -> Bool {
-    return nil != objs.indexOf(predicate)
+  public func containsIf ( _ predicate: @noescape (Item) -> Bool) -> Bool {
+    return nil != objs.index(where: predicate)
   }
   
-  private mutating func bubbling (c:Int, _ item: Item) {
+  private mutating func bubbling (_ c:Int, _ item: Item) {
     let p = hp(c)
     if c > 0 && compare(item, objs[p]) {
       objs[c] = objs[p]
@@ -193,12 +193,12 @@ public struct Heap <E:Comparable> : HeapType {
     else { objs[c] = item }
   }
   
-  public mutating func insert (item : Item) {
+  public mutating func insert (_ item : Item) {
     objs.append(item)
     bubbling (objs.count - 1, item)
   }
   
-  public func map<U> (transform : (Item) -> U) -> Heap<U> {
+  public func map<U> (_ transform : (Item) -> U) -> Heap<U> {
     var heap = Heap<U>()
     for item in objs {
       heap.insert(transform (item))
@@ -225,17 +225,17 @@ extension Heap : OrderedBagType {
     return objs.isEmpty
   }
   
-  public func app (@noescape apply: (Item) -> Void) -> Void {
+  public func app ( _ apply: @noescape (Item) -> Void) -> Void {
     var temp = self
     while let item = temp.extract() { apply(item) }
   }
   
-  public func app (@noescape apply: (Item) throws  -> Void) rethrows -> Void {
+  public func app (_ apply: @noescape (Item) throws  -> Void) rethrows -> Void {
     var temp = self
     while let item = temp.extract() { try apply (item) }
   }
   
-  public func filter (@noescape includeElement: (Item) -> Bool) -> Heap<Item> {
+  public func filter ( _ includeElement: @noescape (Item) -> Bool) -> Heap<Item> {
     var heap = Heap<Item>()
     for item in objs.filter(includeElement) {
       heap.insert(item)
@@ -250,7 +250,7 @@ extension Heap : OrderedBagType {
   }
   
   // Surely avoid the default BagType implementation using `app()`
-  public func contains (item: Item) -> Bool {
+  public func contains (_ item: Item) -> Bool {
     return objs.contains(item)
   }
 }

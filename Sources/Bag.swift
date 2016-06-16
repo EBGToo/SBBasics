@@ -35,10 +35,10 @@ public protocol BagType {
   // mutating func clear ()
 
   /// Apply `body` to each item in the `Bag` */
-  func app (@noescape body: (Item) throws  -> Void) rethrows -> Void
+  func app ( _ body: @noescape (Item) throws  -> Void) rethrows -> Void
 
   /// Return a new `Bag` with the items that satisfy `includeElement`.
-  func filter (@noescape includeElement: (Item) -> Bool) -> Self
+  func filter ( _ includeElement: @noescape (Item) -> Bool) -> Self
   // Note: Prevents `TreeType` from being a BagType
 
   /// Return a new `Bag` with items created by applying `transform`
@@ -48,7 +48,7 @@ public protocol BagType {
 extension BagType where Item:Equatable {
   
   /// Return `true` if the bag contains `item`, `false` otherwise.
-  public func contains (item: Item) -> Bool {
+  public func contains (_ item: Item) -> Bool {
     var found = false
     app { found = found || (item == $0) }
     return found
@@ -79,13 +79,13 @@ public protocol OrderedBagType : BagType {
   ///
   /// - returns 
   ///
-  func reduce<Result>(initial: Result, @noescape combine: (Result, Item) -> Result) -> Result
+  func reduce<Result>(_ initial: Result, combine: @noescape(Result, Item) -> Result) -> Result
 }
 
 extension OrderedBagType {
   
   // Default implementation
-  public func reduce<Result>(initial: Result, @noescape combine: (Result, Item) -> Result) -> Result {
+  public func reduce<Result>(_ initial: Result, combine: @noescape(Result, Item) -> Result) -> Result {
     var initial = initial
     app { initial = combine (initial, $0) }
     return initial
@@ -123,12 +123,12 @@ public struct Bag<E> : BagType {
   }
     
   /** Apply `body` to each item in the `Bag` */
-  public func app (@noescape body: (Item) throws -> Void) rethrows -> Void {
+  public func app (_ body: @noescape (Item) throws -> Void) rethrows -> Void {
     try items.forEach(body)
   }
   
   /// Return a new `Bag` with the items that satisfy `includeElement`
-  public func filter (@noescape includeElement: (Item) -> Bool) -> Bag<Item> {
+  public func filter ( _ includeElement: @noescape (Item) -> Bool) -> Bag<Item> {
     return Bag<Item> (items: items.filter (includeElement))
   }
   
@@ -145,7 +145,7 @@ public struct Bag<E> : BagType {
   // Bag 
   
   /// Add `item`
-  public mutating func insert (item:Item) {
+  public mutating func insert (_ item:Item) {
     items.append(item)
   }
   
@@ -163,9 +163,9 @@ public struct Bag<E> : BagType {
   ///
   /// - returns: true if an object was removed, false otherwise
   ///
-  public mutating func removeIf (predicate: (Item) -> Bool) -> Bool {
-    if let index = items.indexOf (predicate) {
-      items.removeAtIndex(index)
+  public mutating func removeIf (_ predicate: (Item) -> Bool) -> Bool {
+    if let index = items.index (where: predicate) {
+      items.remove(at: index)
       return true
     }
     return false
@@ -188,12 +188,12 @@ extension Bag : ArrayLiteralConvertible {
 extension Bag where E:Equatable {
   
   /// Remove `item` if it exists and return true; otherwise return false
-  public mutating func remove (item:Item) -> Bool {
+  public mutating func remove (_ item:Item) -> Bool {
     return removeIf { $0 == item }
   }
 
   /// Return `true` if the bag contains `item`, `false` otherwise.
-  public func contains (item: Item) -> Bool {
+  public func contains (_ item: Item) -> Bool {
     return items.contains(item)
   }
 }
