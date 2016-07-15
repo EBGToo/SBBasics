@@ -216,18 +216,18 @@ class TreeTest: XCTestCase {
     for _ in 0..<n {
       ty.insert (Int(arc4random()) % n)
     }
-    ty.count
-    ty.left?.height
-    ty.right?.height
+    _ = ty.count
+    _ = ty.left?.height
+    _ = ty.right?.height
     
     var tz = BinaryTree<Int>()
     let m = 10
     for _ in 0..<m {
       tz.insert (Int(arc4random()) % m)
     }
-    tz.count
-    tz.left?.height
-    tz.right?.height
+    _ = tz.count
+    _ = tz.left?.height
+    _ = tz.right?.height
   }
   
   func testBinaryTreeSuccessor () {

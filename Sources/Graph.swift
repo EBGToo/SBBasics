@@ -754,7 +754,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
     case .bellmanFord:
       // We'll relax all edges countOfNodes times (M*N)
       for _ in 0..<countOfNodes {
-        appEdgesInternal{ (e) in relax (e); return }
+        appEdgesInternal{ (e) in _ = relax (e); return }
       }
       
       /*

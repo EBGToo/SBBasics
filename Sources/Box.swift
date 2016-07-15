@@ -387,12 +387,12 @@ public final class BinaryBox<Item:Comparable> : Box<Item> {
     // We are the Root's Left
     let roots_left = nil != root && self === root!.left
     
-    self.spliceAtLeft  (left.right!) // assumed?!
-    left.spliceAtRight (self)
+    _ = self.spliceAtLeft  (left.right!) // assumed?!
+    _ = left.spliceAtRight (self)
   
     if nil != root {
-      if roots_left { root!.spliceAtLeft(left) }
-      else { root!.spliceAtRight(left) }
+      if roots_left { _ = root!.spliceAtLeft(left) }
+      else { _ = root!.spliceAtRight(left) }
     }
     return left
   }
