@@ -259,7 +259,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   
   // Deal with this... no node, no edge
   public func addEdge (_ key:KE, source:KN, target:KN, weight:Double = 0.0) {
-    if let src = nodes[source], tgt = nodes[target] {
+    if let src = nodes[source], let tgt = nodes[target] {
       let edge = Edge(key: key, source: src, target: tgt)
       edge.wgt = weight
       edges[key] = edge
