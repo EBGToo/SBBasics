@@ -89,7 +89,7 @@ public struct Stack<E> : StackType {
 
 // MARK: Stack as ArrayLiteralConvertible
 
-extension Stack : ArrayLiteralConvertible {
+extension Stack : ExpressibleByArrayLiteral {
   
   ///
   /// Create a Stack instance with the provided elements ordered such that element[0] will the

@@ -56,7 +56,7 @@ extension LazyListType {
   }
   
   public var list : List<Item> {
-    var result = List<Item>.nil
+    var result = List<Item>.none
     app { result = List<Item>($0, result) }
     return result.reverse
   }

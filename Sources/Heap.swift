@@ -209,7 +209,7 @@ public struct Heap <E:Comparable> : HeapType {
 
 // MARK: Heap as ArrayLiteralConvertible
 
-extension Heap : ArrayLiteralConvertible {
+extension Heap : ExpressibleByArrayLiteral {
   public init (arrayLiteral elements: Item...) { self.init(items: elements) }
 }
 

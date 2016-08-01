@@ -117,18 +117,18 @@ public struct Tree<T> : TreeType {
   }
   
   public var count : Int {
-    return kids.map { $0.count }.reduce(1, combine: +)
+    return kids.map { $0.count }.reduce(1, +)
   }
   
   public var height : Int {
-    return kids.isEmpty ? 0 : (1 + kids.map { $0.height }.reduce (Int.min, combine: max))
+    return kids.isEmpty ? 0 : (1 + kids.map { $0.height }.reduce (Int.min, max))
   }
   
   public func depth (_ item: Item, pred: (Item, Item) -> Bool) -> Int? {
     if pred (self.item, item) { return 0 }
     
     let result = kids.flatMap { $0.depth (item, pred: pred) }
-      .reduce (Int.max, combine: min)
+      .reduce (Int.max, min)
   
     return result == Int.max ? nil : 1 + result
   }
@@ -327,8 +327,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// The `item`
   public var item : Item {
     switch self {
-    case empty: unexpectedEmpty()
-    case let node (_, _, item, _): return item
+    case .empty: unexpectedEmpty()
+    case let .node (_, _, item, _): return item
     }
   }
   
@@ -383,8 +383,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// The number of descendents (includes self)
   public var count : Int {
     switch self {
-    case empty: return 0
-    case let node (_, l, _, r):
+    case .empty: return 0
+    case let .node (_, l, _, r):
       return 1 + l.count + r.count
     }
   }
@@ -392,8 +392,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   /// The longest count of descendents along any path.  A leaf (no kids) has a height of zero
   public var height : Int {
     switch self {
-    case empty: return -1
-    case let node (_, l, _, r):
+    case .empty: return -1
+    case let .node (_, l, _, r):
       return 1 + max (l.height, r.height)
     }
   }
@@ -468,7 +468,7 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
 
     switch self {
     case .empty: return
-    case let node (_, l, item, r):
+    case let .node (_, l, item, r):
       preOrder?(item)
       rwalk(l)
       inOrder? (item)
@@ -554,7 +554,7 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
       if item < that { return l.lookup (item, path: List<Box>(self, path), done: done) }
       if item > that { return r.lookup (item, path: List<Box>(self, path), done: done) }
       return done (path: List<Box>(self, path))
-    case .empty: return done (path: List<Box>.nil)
+    case .empty: return done (path: List<Box>.none)
     }
   }
 
@@ -571,14 +571,14 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   }
   
   public func predecessor (_ item: Item) -> BinaryTree<Item>? {
-    return lookup (item, path: .nil) { (path:List<Box>) -> Box? in
+    return lookup (item, path: .none) { (path:List<Box>) -> Box? in
       guard case let .cons(box, rest) = path else { return nil } // Item not found
       return box.left?.maximum ?? box.upRight(rest)
     }
   }
   
   public func successor (_ item: Item) -> BinaryTree<Item>? {
-    return lookup (item, path: .nil) { (path:List<Box>) -> Box? in
+    return lookup (item, path: .none) { (path:List<Box>) -> Box? in
       guard case let .cons(box, rest) = path else { return nil } // Item not found
       return box.right?.minimum ?? box.upLeft(rest)
     }
@@ -589,8 +589,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   public func insertNew (_ item: Item) -> BinaryTree<Item> {
     func ins (_ this: BinaryTree<Item>, _ item: Item) -> BinaryTree<Item> {
       switch this {
-      case empty: return BinaryTree (item: item, color: .r)
-      case let node (color, left, that, right):
+      case .empty: return BinaryTree (item: item, color: .r)
+      case let .node (color, left, that, right):
         if item < that { return BinaryTree (item: that, color: color, left: ins(left, item), right: right).balance() }
         if item > that { return BinaryTree (item: that, color: color, left: left, right: ins(right, item)).balance() }
         return self
@@ -598,8 +598,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
     }
     
     switch ins (self, item) {
-    case empty: fatalError ("impossible")
-    case let node (_, left, item, right):
+    case .empty: fatalError ("impossible")
+    case let .node (_, left, item, right):
       return .node(.b, left, item, right)
     }
   }
@@ -672,7 +672,7 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
       return l
 
       // Self That w/ Left and Right
-    case let node (c, l, that, r):
+    case let .node (c, l, that, r):
       if item < that { return BinaryTree (item: that, color: c, left: l.deleteNew(item), right: r) }
       if item > that { return BinaryTree (item: that, color: c, left: l, right: r.deleteNew(item)) }
 
@@ -686,7 +686,7 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   }
 }
 
-extension BinaryTree : ArrayLiteralConvertible {
+extension BinaryTree : ExpressibleByArrayLiteral {
   public init(arrayLiteral elements: Item...) {
     self.init (items: elements)
   }

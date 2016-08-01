@@ -89,21 +89,21 @@ public protocol ListType : ListBaseType, BagType {
 
 /// A List
 public enum List<T> : ListType {
-  case `nil`
+  case none
   indirect case cons (T, List<T>)
   
   public typealias Item = T
   
   public var car : T? {
     switch self {
-    case .nil: return nil
+    case .none: return nil
     case .cons (let car, _): return car
     }
   }
   
   public var cdr : List<T>? {
     switch self {
-    case .nil: return nil
+    case .none: return nil
     case .cons (_, let cdr): return cdr
     }
   }
@@ -112,35 +112,35 @@ public enum List<T> : ListType {
   // MARK: Init
   
   public init (elements: [T]) {
-    self = `nil`
+    self = .none
     for elt in elements.reversed() {
-      self = cons(elt, self)
+      self = .cons(elt, self)
     }
   }
   
   public init () {
-    self = `nil`
+    self = .none
   }
   
   public init (_ car: T) {
-    self = cons (car, `nil`)
+    self = .cons (car, .none)
   }
   
   public init (_ car: T, _ cdr: List<T>) {
-    self = cons (car, cdr)
+    self = .cons (car, cdr)
   }
   
   public var first : T? {
     switch self {
-    case .nil: return nil
+    case .none: return nil
     case let .cons (car, _): return car
     }
   }
   
   public var last : T? {
     switch self {
-    case .nil: return nil
-    case let .cons (car, .nil): return car
+    case .none: return nil
+    case let .cons (car, .none): return car
     case let .cons (_, cdr):
       return cdr.last
     }
@@ -148,7 +148,7 @@ public enum List<T> : ListType {
   
   public subscript(n:Int) -> T? {
     switch self {
-    case .nil: return nil
+    case .none: return nil
     case let .cons (car, cdr):
       return (0 == n ? car : cdr[n - 1])
     }
@@ -158,44 +158,44 @@ public enum List<T> : ListType {
   
   private func rmapping<U> (_ r: List<U>, _ transform: @noescape (Item) -> U) -> List<U> {
     switch self {
-    case .nil: return r
+    case .none: return r
     case let .cons (car, cdr):
       return cdr.rmapping (List<U>.cons (transform (car), r), transform)
     }
   }
 
   public func map<U> ( _ transform: @noescape (T) -> U) -> List<U> {
-    return reverse.rmapping (List<U>.nil, transform)
+    return reverse.rmapping (List<U>.none, transform)
   }
   
   private func rfiltering (_ r: List<Item>, _ includeElement: @noescape (Item) -> Bool) -> List<Item> {
     switch self {
-    case .nil: return r
+    case .none: return r
     case let .cons (car, cdr):
       return cdr.rfiltering (includeElement(car) ? List<Item>.cons (car, r) : r, includeElement)
     }
   }
 
   public func filter ( _ includeElement: @noescape (Item) -> Bool) -> List<T> {
-    return reverse.rfiltering (List<Item>.nil, includeElement)
+    return reverse.rfiltering (List<Item>.none, includeElement)
   }
 
   public var reverse : List<T> {
     func reving (_ l: List<T>, _ r:List<T>) -> List<T> {
       switch l {
-      case .nil: return r
+      case .none: return r
       case let .cons (car, cdr):
         return reving (cdr, List.cons(car, r))
       }
     }
-    return reving (self, List<T>.nil)
+    return reving (self, List<T>.none)
   }
  
   public func partition (_ pred: (T) -> Bool) -> (List<T>, List<T>) {
     func parting (_ lst: List<T>, pos: List<T>, neg: List<T>, pred: (T) -> Bool)
         -> (List<T>, List<T>) {
             switch lst {
-            case .nil: return (pos, neg)
+            case .none: return (pos, neg)
             case let .cons (car, cdr):
                 return (pred (car)
                     ? parting (cdr, pos: List.cons(car, pos), neg: neg, pred: pred)
@@ -210,7 +210,7 @@ public enum List<T> : ListType {
     
   public func foldl<S> (_ initial: S, combine: @noescape (S, T) -> S) -> S {
     switch self {
-    case .nil: return initial
+    case .none: return initial
     case let .cons (car, cdr):
         return cdr.foldl (combine (initial, car), combine: combine)
     }
@@ -218,7 +218,7 @@ public enum List<T> : ListType {
   
   public func foldr<S> (_ initial: S, combine: (T, S) -> S) -> S {
     switch self {
-    case .nil: return initial
+    case .none: return initial
     case let .cons (car, cdr):
       return combine (car, cdr.foldr (initial, combine: combine))
     }
@@ -240,7 +240,7 @@ public enum List<T> : ListType {
   
   public func any ( _ predicate: @noescape (T) -> Bool) -> Bool {
     switch self {
-    case .nil: return false
+    case .none: return false
     case let .cons (car, cdr):
       return predicate(car) || cdr.any(predicate)
     }
@@ -248,7 +248,7 @@ public enum List<T> : ListType {
   
   public func all ( _ predicate: @noescape (T) -> Bool) -> Bool {
     switch self {
-    case .nil: return true
+    case .none: return true
     case let .cons (car, cdr):
       return predicate(car) && cdr.all(predicate)
     }
@@ -260,7 +260,7 @@ public enum List<T> : ListType {
   }
 }
 
-extension List : ArrayLiteralConvertible {
+extension List : ExpressibleByArrayLiteral {
   public init(arrayLiteral elements: T...) {
     self.init(elements: elements)
   }
@@ -273,14 +273,14 @@ extension List : BagType {
 
   public var isEmpty : Bool {
     switch self {
-    case .nil: return true
+    case .none: return true
     case .cons: return false
     }
   }
   
   public var count : Int {
     switch self {
-    case .nil: return 0
+    case .none: return 0
     case let .cons (_, cdr):
       return 1 + cdr.count
     }
@@ -288,7 +288,7 @@ extension List : BagType {
 
   public func app ( _ apply: @noescape (T) -> ())  {
     switch self {
-    case .nil: return
+    case .none: return
     case let .cons (car, cdr):
       apply (car)
       cdr.app (apply)
@@ -297,7 +297,7 @@ extension List : BagType {
   
   public func app (_ apply: @noescape (T) throws -> ()) rethrows {
     switch self {
-    case .nil: return
+    case .none: return
     case let .cons (car, cdr):
       try apply (car)
       try cdr.app (apply)
@@ -320,7 +320,7 @@ extension List : BagType {
 extension List where T : Equatable {
   public func contains (_ item: Item) -> Bool {
     switch self {
-    case .nil: return false
+    case .none: return false
     case let .cons (car, cdr):
       return item == car || cdr.contains(item)
     }

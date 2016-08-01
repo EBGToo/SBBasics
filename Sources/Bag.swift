@@ -172,7 +172,7 @@ public struct Bag<E> : BagType {
   }
 }
 
-extension Bag : ArrayLiteralConvertible {
+extension Bag : ExpressibleByArrayLiteral {
   
   /// Create in instance holding `items`
   public init(arrayLiteral elements: Item...) {

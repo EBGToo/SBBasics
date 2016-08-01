@@ -93,7 +93,7 @@ public struct Queue<E> : QueueType {
 ///
 /// A Queue is an ArrayLiteralConvertible
 ///
-extension Queue : ArrayLiteralConvertible {
+extension Queue : ExpressibleByArrayLiteral {
   public init(arrayLiteral elements: Item...) {
     objs = elements
   }
@@ -148,6 +148,6 @@ extension Queue where E : Equatable {
 ///
 extension Queue : OrderedBagType {
   public func reduce<Result>(_ initial: Result, combine: @noescape (Result, E) -> Result) -> Result {
-    return objs.reduce (initial, combine: combine)
+    return objs.reduce (initial, combine)
   }
 }
