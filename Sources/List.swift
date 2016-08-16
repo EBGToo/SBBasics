@@ -44,7 +44,7 @@ public protocol ListType : ListBaseType, BagType {
   /// - parameter combine:
   /// - returns:
   ///
-  func foldl<S> (_ initial: S, combine: @noescape (S, Item) -> S) -> S
+  func foldl<S> (_ initial: S, combine: (S, Item) -> S) -> S
 
   ///
   ///
@@ -57,10 +57,10 @@ public protocol ListType : ListBaseType, BagType {
   func foldr<S> (_ initial: S, combine: (Item, S) -> S) -> S
 
   ///  Check if `any` Item satisfies `predicate`
-  func any ( _ predicate: @noescape (Item) -> Bool) -> Bool
+  func any ( _ predicate: (Item) -> Bool) -> Bool
 
   /// Check if `all` Items satisfy `predicate`
-  func all ( _ predicate: @noescape (Item) -> Bool) -> Bool
+  func all ( _ predicate: (Item) -> Bool) -> Bool
 
   /// Check if `self` and `that` have idential Items compared with `pred`
   func equalToList (_ that: List<Item>, pred: (Item, Item) -> Bool) -> Bool
@@ -75,10 +75,10 @@ public protocol ListType : ListBaseType, BagType {
   var last : Item? { get }
 
   /// A list with the items that satisfy `includeElement`
-  func filter ( _ includeElement: @noescape (Item) -> Bool) -> List<Item>
+  func filter ( _ includeElement: (Item) -> Bool) -> List<Item>
   
   /// A list with `transform` applied to each item
-  func map<U> ( _ transform: @noescape (Item) -> U) -> List<U>
+  func map<U> ( _ transform: (Item) -> U) -> List<U>
 
   /// A Lazy list
   var lazy : LazyList<List<Item>> { get }
@@ -156,7 +156,7 @@ public enum List<T> : ListType {
 
   // MARK: Map, Filter, Reverse, Partition -> List
   
-  private func rmapping<U> (_ r: List<U>, _ transform: @noescape (Item) -> U) -> List<U> {
+  private func rmapping<U> (_ r: List<U>, _ transform: (Item) -> U) -> List<U> {
     switch self {
     case .none: return r
     case let .cons (car, cdr):
@@ -164,11 +164,11 @@ public enum List<T> : ListType {
     }
   }
 
-  public func map<U> ( _ transform: @noescape (T) -> U) -> List<U> {
+  public func map<U> ( _ transform: (T) -> U) -> List<U> {
     return reverse.rmapping (List<U>.none, transform)
   }
   
-  private func rfiltering (_ r: List<Item>, _ includeElement: @noescape (Item) -> Bool) -> List<Item> {
+  private func rfiltering (_ r: List<Item>, _ includeElement: (Item) -> Bool) -> List<Item> {
     switch self {
     case .none: return r
     case let .cons (car, cdr):
@@ -176,7 +176,7 @@ public enum List<T> : ListType {
     }
   }
 
-  public func filter ( _ includeElement: @noescape (Item) -> Bool) -> List<T> {
+  public func filter ( _ includeElement: (Item) -> Bool) -> List<T> {
     return reverse.rfiltering (List<Item>.none, includeElement)
   }
 
@@ -208,7 +208,7 @@ public enum List<T> : ListType {
     
   // MARK: foldl, foldr
     
-  public func foldl<S> (_ initial: S, combine: @noescape (S, T) -> S) -> S {
+  public func foldl<S> (_ initial: S, combine: (S, T) -> S) -> S {
     switch self {
     case .none: return initial
     case let .cons (car, cdr):
@@ -238,7 +238,7 @@ public enum List<T> : ListType {
         self.cdr!.equalToList(that.cdr!, pred: pred))
   }
   
-  public func any ( _ predicate: @noescape (T) -> Bool) -> Bool {
+  public func any ( _ predicate: (T) -> Bool) -> Bool {
     switch self {
     case .none: return false
     case let .cons (car, cdr):
@@ -246,7 +246,7 @@ public enum List<T> : ListType {
     }
   }
   
-  public func all ( _ predicate: @noescape (T) -> Bool) -> Bool {
+  public func all ( _ predicate: (T) -> Bool) -> Bool {
     switch self {
     case .none: return true
     case let .cons (car, cdr):
@@ -286,7 +286,7 @@ extension List : BagType {
     }
   }
 
-  public func app ( _ apply: @noescape (T) -> ())  {
+  public func app ( _ apply: (T) -> ())  {
     switch self {
     case .none: return
     case let .cons (car, cdr):
@@ -295,7 +295,7 @@ extension List : BagType {
     }
   }
   
-  public func app (_ apply: @noescape (T) throws -> ()) rethrows {
+  public func app (_ apply: (T) throws -> ()) rethrows {
     switch self {
     case .none: return
     case let .cons (car, cdr):
@@ -330,7 +330,7 @@ extension List where T : Equatable {
 // MARK: List as OrderedBagType
 
 extension List : OrderedBagType {
-  public func reduce<Result>(_ initial: Result, combine: @noescape (Result, Item) -> Result) -> Result {
+  public func reduce<Result>(_ initial: Result, combine: (Result, Item) -> Result) -> Result {
     return foldl(initial, combine: combine)
   }
 }

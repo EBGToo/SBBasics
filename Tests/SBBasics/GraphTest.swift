@@ -6,6 +6,7 @@
 //  Copyright © 2015 Opus Logica Inc. All rights reserved.
 //
 import XCTest
+import SBCommons
 @testable import SBBasics
 
 class GraphTest: XCTestCase {

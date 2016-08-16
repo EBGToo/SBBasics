@@ -131,9 +131,9 @@ func ==<KN:Hashable, KE:Hashable> (lhs:Node<KN,KE>, rhs:Node<KN,KE>) -> Bool {
 //
 //
 public class PathWeight<KN> : Comparable, CustomStringConvertible {
-  public private(set) var key : KN
-  public private(set) var wgt : Double = 0.0
-  public private(set) var lnk : KN?
+  public internal(set) var key : KN
+  public internal(set) var wgt : Double = 0.0
+  public internal(set) var lnk : KN?
   
   internal init (key: KN, wgt: Double) {
     self.key = key
@@ -239,15 +239,15 @@ public class Graph<KN:Hashable, KE:Hashable> {
     return nodes.count
   }
   
-  public func appNodes (_ apply: (key:KN) -> Void) {
+  public func appNodes (_ apply: (_ key:KN) -> Void) {
     for (_, node): (KN, Node<KN,KE>) in nodes {
-      apply (key: node.key)
+      apply (node.key)
     }
   }
   
-  internal func appNodesInternal (_ apply: (node:Node<KN,KE>) -> Void) {
+  internal func appNodesInternal (_ apply: (_ node:Node<KN,KE>) -> Void) {
     for (_, node): (KN, Node<KN,KE>) in nodes {
-      apply (node: node)
+      apply (node)
     }
   }
   
@@ -291,15 +291,15 @@ public class Graph<KN:Hashable, KE:Hashable> {
     return edges[key]?.wgt;
   }
   
-  public func appEdges (_ apply: (key:KE, source:KN, target:KN) -> Void) {
+  public func appEdges (_ apply: (_ key:KE, _ source:KN, _ target:KN) -> Void) {
     for (_, edge): (KE, Edge<KE,KN>) in edges {
-      apply (key: edge.key, source: edge.source.key, target: edge.target.key)
+      apply (edge.key, edge.source.key, edge.target.key)
     }
   }
 
-  internal func appEdgesInternal (_ apply: (edge:Edge<KE,KN>) -> Void) {
+  internal func appEdgesInternal (_ apply: (_ edge:Edge<KE,KN>) -> Void) {
     for (_, edge): (KE, Edge<KE,KN>) in edges {
-      apply (edge: edge)
+      apply (edge)
     }
   }
   
@@ -345,7 +345,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   // typealias walkPathVisitor = (node:Node<KN,KE>, var path: List<Node<KN,KE>>) -> Void
 
   func walkPathsFromNode (_ node:Node<KN,KE>, path: List<Node<KN,KE>>,
-    visit: (node:Node<KN,KE>) -> Bool,
+    visit: (_ node:Node<KN,KE>) -> Bool,
     handle: (List<KN>) -> Void) {
       
       var path = path
@@ -356,7 +356,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
       // Assume a leaf, unless we visit an adjacent node
       var leaf = true;
       node.appAdjacentNodes { (next: Node<KN, KE>) in
-        if visit (node: next) {
+        if visit (next) {
           leaf = false
           self.walkPathsFromNode(next, path: path, visit: visit, handle: handle)
         }
@@ -375,9 +375,9 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter key: The node to start from.
   /// - parameter f: The function to apply to each visited node
   ///
-  public func breadthFirstSearch (_ key: KN, f: ((key: KN) -> Void)) {
+  public func breadthFirstSearch (_ key: KN, f: ((_ key: KN) -> Void)) {
     breadthFirstSearchInternal (key,
-      starter: { (node:Node<KN,KE>) in f (key: node.key) })
+      starter: { (node:Node<KN,KE>) in f (node.key) })
   }
 
   ///
@@ -391,20 +391,20 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter rooter: The function to aply to each root.
   ///
   public func breadthFirstSearchDetailed (_ key: KN,
-    starter:  ((key: KN) -> Void)  = { (key: KN) in return },
-    finisher: ((key: KN) -> Void)  = { (key: KN) in return },
-    rooter:   ((key: KN) -> Void)? = nil)
+    starter:  ((_ key: KN) -> Void)  = { (key: KN) in return },
+    finisher: ((_ key: KN) -> Void)  = { (key: KN) in return },
+    rooter:   ((_ key: KN) -> Void)? = nil)
   {
     breadthFirstSearchInternal (key,
-      starter:  { (node) in starter  (key: node.key) },
-      finisher: { (node) in finisher (key: node.key) },
-      rooter:   (nil == rooter ? nil : { (node) in rooter! (key: node.key) }))
+      starter:  { (node) in starter  (node.key) },
+      finisher: { (node) in finisher (node.key) },
+      rooter:   (nil == rooter ? nil : { (node) in rooter! (node.key) }))
   }
 
   internal func breadthFirstSearchInternal (_ key: KN,
-    starter:  ((node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
-    finisher: ((node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
-    rooter:   ((node: Node<KN,KE>) -> Void)? = nil)
+    starter:  ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
+    finisher: ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
+    rooter:   ((_ node: Node<KN,KE>) -> Void)? = nil)
   {
     // Skip out
     if nil == nodes[key] { return }
@@ -421,7 +421,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
       s.color = c
       s.d     = d
       ps?.kidAdd(s)
-      starter (node: n)
+      starter (n)
     }
     
     // Give every Node a SearchBox to hold walk state
@@ -443,7 +443,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
       _ = queue.dequeue().map (search)
 
       ns.color = .black
-      finisher(node: n)
+      finisher(n)
     }
     
     time += 1
@@ -471,10 +471,10 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter key: The node to start from.
   /// - parameter f: The function to apply to each visited node
   ///
-  func depthFirstSearch (_ key: KN, f: ((key: KN) -> Void)) {
+  func depthFirstSearch (_ key: KN, f: ((_ key: KN) -> Void)) {
     if hasNode(key) {
       depthFirstSearchInternal (key,
-        starter: { (node:Node<KN,KE>) in f (key: node.key) })
+        starter: { (node:Node<KN,KE>) in f (node.key) })
     }
   }
 
@@ -489,14 +489,14 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter rooter: The function to aply to each root.
   ///
   func depthFirstSearchDetailed (_ key: KN,
-      starter:  ((key: KN) -> Void)  = { (key: KN) in return },
-      finisher: ((key: KN) -> Void)  = { (key: KN) in return },
-      rooter:   ((key: KN) -> Void)? = nil)
+      starter:  ((_ key: KN) -> Void)  = { (key: KN) in return },
+      finisher: ((_ key: KN) -> Void)  = { (key: KN) in return },
+      rooter:   ((_ key: KN) -> Void)? = nil)
   {
     depthFirstSearchInternal (key,
-      starter:  { (node) in starter  (key: node.key) },
-      finisher: { (node) in finisher (key: node.key) },
-      rooter:   (nil == rooter ? nil : { (node) in rooter! (key: node.key) }))
+      starter:  { (node) in starter  (node.key) },
+      finisher: { (node) in finisher (node.key) },
+      rooter:   (nil == rooter ? nil : { (node) in rooter! (node.key) }))
   }
 
   ///
@@ -506,16 +506,16 @@ public class Graph<KN:Hashable, KE:Hashable> {
   ///
   /// - parameter f: The function to apply to each visited node.
   ///
-  func depthFirstSearchAll (_ f: ((key: KN) -> Void)) {
+  func depthFirstSearchAll (_ f: ((_ key: KN) -> Void)) {
     depthFirstSearchInternal (nil,
-      starter: { (node:Node<KN,KE>) in f (key: node.key) })
+      starter: { (node:Node<KN,KE>) in f (node.key) })
   }
   
   ///
   internal func depthFirstSearchInternal (_ key: KN?,
-    starter:  ((node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
-    finisher: ((node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
-    rooter:   ((node: Node<KN,KE>) -> Void)? = nil)
+    starter:  ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
+    finisher: ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
+    rooter:   ((_ node: Node<KN,KE>) -> Void)? = nil)
   {
     typealias Box = SearchBox<Node<KN,KE>>
     
@@ -536,7 +536,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
       s.color = c
       s.d     = d
       ps?.kidAdd (s)
-      starter (node: n)
+      starter (n)
     }
     
     // Search a Node - tortured recursion
@@ -555,7 +555,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
         
         ns.color = .black
         time += 1; ns.f = time
-        finisher (node: n)
+        finisher (n)
       }
     }
     

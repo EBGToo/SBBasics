@@ -17,7 +17,6 @@
 		3C2895B71BFFB91800C85BD2 /* TreeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C2895AE1BFFB91800C85BD2 /* TreeTest.swift */; };
 		3C3A15A21BFFD51500135446 /* BagTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C3A15A11BFFD51500135446 /* BagTest.swift */; };
 		3C7C278D1CA48D20001B31A8 /* SBCommons.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7C278C1CA48D20001B31A8 /* SBCommons.framework */; };
-		3C7C278E1CA48D95001B31A8 /* SBCommons.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C7C278C1CA48D20001B31A8 /* SBCommons.framework */; };
 		3CC7415D1C062B2B0043401D /* BoxTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C2895A61BFFB91800C85BD2 /* BoxTest.swift */; };
 		3CE261331C19470500BE08C4 /* RingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE261321C19470500BE08C4 /* RingTest.swift */; };
 		3CE5D1AD1C178CBD00550AD6 /* SBBasics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2895211BFFB78400C85BD2 /* SBBasics.framework */; };
@@ -49,7 +48,7 @@
 		3C2895241BFFB78400C85BD2 /* SBBasics.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SBBasics.h; sourceTree = "<group>"; };
 		3C2895261BFFB78400C85BD2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3C28952B1BFFB78400C85BD2 /* SBBasicsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SBBasicsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3C2895321BFFB78400C85BD2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3C2895321BFFB78400C85BD2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../Info.plist; sourceTree = "<group>"; };
 		3C2895901BFFB8F400C85BD2 /* Box.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Box.swift; sourceTree = "<group>"; };
 		3C2895911BFFB8F400C85BD2 /* Bag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bag.swift; sourceTree = "<group>"; };
 		3C2895931BFFB8F400C85BD2 /* Graph.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Graph.swift; sourceTree = "<group>"; };
@@ -91,7 +90,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3C7C278E1CA48D95001B31A8 /* SBCommons.framework in Frameworks */,
 				3CE5D1AD1C178CBD00550AD6 /* SBBasics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

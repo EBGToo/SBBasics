@@ -319,8 +319,8 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
     self = split (.b, items[0..<items.count])
   }
   
-  @noreturn
-  private func unexpectedEmpty () {
+  
+  private func unexpectedEmpty () -> Never  {
     preconditionFailure("BinaryTree at .Empty unexpectedly.")
   }
   
@@ -548,13 +548,13 @@ public enum BinaryTree<Item: Comparable> : BinaryTreeType {
   
   private typealias Box = BinaryTree<Item>
   
-  private func lookup (_ item: Item, path: List<Box>, done: (path: List<Box>) -> Box?) -> Box? {
+  private func lookup (_ item: Item, path: List<Box>, done: (_ path: List<Box>) -> Box?) -> Box? {
     switch self {
     case let .node (_, l, that, r):
       if item < that { return l.lookup (item, path: List<Box>(self, path), done: done) }
       if item > that { return r.lookup (item, path: List<Box>(self, path), done: done) }
-      return done (path: List<Box>(self, path))
-    case .empty: return done (path: List<Box>.none)
+      return done (List<Box>(self, path))
+    case .empty: return done (List<Box>.none)
     }
   }
 

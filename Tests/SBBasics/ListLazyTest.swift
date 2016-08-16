@@ -18,14 +18,14 @@ class ctxxTests: XCTestCase {
     super.tearDown()
   }
   
-  func mapperWith (_ label:String, f: (Int) -> Int) -> (Int) -> Int {
+  func mapperWith (_ label:String, f: @escaping (Int) -> Int) -> (Int) -> Int {
     return { (i:Int) in
       print ("\(label): \(i)")
       return f(i)
     }
   }
   
-  func filterWith (_ label:String, pred: (Int) -> Bool) -> (Int) -> Bool {
+  func filterWith (_ label:String, pred: @escaping (Int) -> Bool) -> (Int) -> Bool {
     return { (i:Int) in
       print ("\(label): \(i)")
       return pred(i)

@@ -27,11 +27,11 @@ public protocol LazyListType : ListBaseType {
 /// A LazyListType extension to ...
 ///
 extension LazyListType {
-  func filter(_ predicate: (Self.Item) -> Bool) -> LazyFilterList<Self> {
+  func filter(_ predicate: @escaping (Self.Item) -> Bool) -> LazyFilterList<Self> {
     return LazyFilterList (base : self, filter : predicate)
   }
   
-  func map<U>(_ transform: (Self.Item) -> U) -> LazyMapList<Self, U> {
+  func map<U>(_ transform: @escaping (Self.Item) -> U) -> LazyMapList<Self, U> {
     return LazyMapList (base : self, transform: transform)
   }
   
@@ -47,7 +47,7 @@ extension LazyListType {
 //    return LazyList(base: base.reverse())
   //  }
   
-  func app ( _ apply: @noescape (Item) -> ()) {
+  func app ( _ apply: (Item) -> ()) {
     var list = self
     while let elt = list.car {
       apply (elt)
@@ -87,7 +87,7 @@ struct LazyMapList<Base : ListBaseType, U> : LazyListType {
   typealias Elements = Base
   
   let base : Base
-  private let transform : (Base.Item) -> U
+  internal let transform : (Base.Item) -> U
   
   var car : U? {
     return base.car.map(transform)
@@ -123,7 +123,7 @@ struct LazyFilterList<Base : ListBaseType> : LazyListType {
     }
   }
   
-  init (base:Base, filter: (Base.Item) -> Bool) {
+  init (base:Base, filter: @escaping (Base.Item) -> Bool) {
     self.base = base
     self.filter = filter
     

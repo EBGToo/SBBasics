@@ -155,7 +155,7 @@ public final class BoxedTree<Item> : Box<Item> {
     return nil != kids.index(of: kid)
   }
   
-  public func appKids (_ f: (kid:BoxedTree<Item>) -> ()) {
+  public func appKids (_ f: (_ kid:BoxedTree<Item>) -> ()) {
     kids.app(f)
   }
   
@@ -171,8 +171,8 @@ public final class BoxedTree<Item> : Box<Item> {
     return result
   }
   
-  public func appDescendents (_ f: (d:BoxedTree<Item>) -> ()) {
-    f (d: self)
+  public func appDescendents (_ f: (_ d:BoxedTree<Item>) -> ()) {
+    f (self)
     appKids { (kid) -> () in kid.appDescendents(f) }
   }
   

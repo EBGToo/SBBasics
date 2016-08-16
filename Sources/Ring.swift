@@ -31,7 +31,7 @@ public struct Ring<E> : RingType {
   var head : Int = 0
   var tail : Int = 0
   
-  private var items = Array<Item>()
+  internal var items = Array<Item>()
   
   public init (capacity: Int) {
     self.capacity = max (capacity, 1)
@@ -81,13 +81,13 @@ extension Ring : BagType {
     return head == tail
   }
   
-  public func app (_ apply: @noescape (Item) throws -> Void) rethrows -> Void {
+  public func app (_ apply: (Item) throws -> Void) rethrows -> Void {
     for index in head ..< tail {
       try apply (items[index % capacity])
     }
   }
   
-  public func filter ( _ includeElement: @noescape (Item) -> Bool) -> Ring<Item> {
+  public func filter ( _ includeElement: (Item) -> Bool) -> Ring<Item> {
     let array  = self.array.filter(includeElement)
     var result = Ring<Item>(capacity: array.count)
     array.forEach { result.put($0) }
@@ -109,7 +109,7 @@ extension Ring : BagType {
 
 
 extension Ring : OrderedBagType {
-  public func reduce<Result>(_ initial: Result, combine: @noescape (Result, E) -> Result) -> Result {
+  public func reduce<Result>(_ initial: Result, combine: (Result, E) -> Result) -> Result {
     var result = initial
     app { result = combine (result, $0) }
     return result

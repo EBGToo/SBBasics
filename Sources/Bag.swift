@@ -35,10 +35,10 @@ public protocol BagType {
   // mutating func clear ()
 
   /// Apply `body` to each item in the `Bag` */
-  func app ( _ body: @noescape (Item) throws  -> Void) rethrows -> Void
+  func app ( _ body: (Item) throws  -> Void) rethrows -> Void
 
   /// Return a new `Bag` with the items that satisfy `includeElement`.
-  func filter ( _ includeElement: @noescape (Item) -> Bool) -> Self
+  func filter ( _ includeElement: (Item) -> Bool) -> Self
   // Note: Prevents `TreeType` from being a BagType
 
   /// Return a new `Bag` with items created by applying `transform`
@@ -79,13 +79,13 @@ public protocol OrderedBagType : BagType {
   ///
   /// - returns 
   ///
-  func reduce<Result>(_ initial: Result, combine: @noescape(Result, Item) -> Result) -> Result
+  func reduce<Result>(_ initial: Result, combine: (Result, Item) -> Result) -> Result
 }
 
 extension OrderedBagType {
   
   // Default implementation
-  public func reduce<Result>(_ initial: Result, combine: @noescape(Result, Item) -> Result) -> Result {
+  public func reduce<Result>(_ initial: Result, combine: (Result, Item) -> Result) -> Result {
     var initial = initial
     app { initial = combine (initial, $0) }
     return initial
@@ -123,12 +123,12 @@ public struct Bag<E> : BagType {
   }
     
   /** Apply `body` to each item in the `Bag` */
-  public func app (_ body: @noescape (Item) throws -> Void) rethrows -> Void {
+  public func app (_ body: (Item) throws -> Void) rethrows -> Void {
     try items.forEach(body)
   }
   
   /// Return a new `Bag` with the items that satisfy `includeElement`
-  public func filter ( _ includeElement: @noescape (Item) -> Bool) -> Bag<Item> {
+  public func filter ( _ includeElement: (Item) -> Bool) -> Bag<Item> {
     return Bag<Item> (items: items.filter (includeElement))
   }
   
