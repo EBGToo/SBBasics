@@ -375,7 +375,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter key: The node to start from.
   /// - parameter f: The function to apply to each visited node
   ///
-  public func breadthFirstSearch (_ key: KN, f: ((_ key: KN) -> Void)) {
+  public func breadthFirstSearch (_ key: KN, f: @escaping ((_ key: KN) -> Void)) {
     breadthFirstSearchInternal (key,
       starter: { (node:Node<KN,KE>) in f (node.key) })
   }
@@ -391,8 +391,8 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter rooter: The function to aply to each root.
   ///
   public func breadthFirstSearchDetailed (_ key: KN,
-    starter:  ((_ key: KN) -> Void)  = { (key: KN) in return },
-    finisher: ((_ key: KN) -> Void)  = { (key: KN) in return },
+    starter:  @escaping ((_ key: KN) -> Void)  = { (key: KN) in return },
+    finisher: @escaping ((_ key: KN) -> Void)  = { (key: KN) in return },
     rooter:   ((_ key: KN) -> Void)? = nil)
   {
     breadthFirstSearchInternal (key,
@@ -402,8 +402,8 @@ public class Graph<KN:Hashable, KE:Hashable> {
   }
 
   internal func breadthFirstSearchInternal (_ key: KN,
-    starter:  ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
-    finisher: ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
+    starter:  @escaping ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
+    finisher: @escaping ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
     rooter:   ((_ node: Node<KN,KE>) -> Void)? = nil)
   {
     // Skip out
@@ -471,7 +471,7 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter key: The node to start from.
   /// - parameter f: The function to apply to each visited node
   ///
-  func depthFirstSearch (_ key: KN, f: ((_ key: KN) -> Void)) {
+  func depthFirstSearch (_ key: KN, f: @escaping ((_ key: KN) -> Void)) {
     if hasNode(key) {
       depthFirstSearchInternal (key,
         starter: { (node:Node<KN,KE>) in f (node.key) })
@@ -489,8 +489,8 @@ public class Graph<KN:Hashable, KE:Hashable> {
   /// - parameter rooter: The function to aply to each root.
   ///
   func depthFirstSearchDetailed (_ key: KN,
-      starter:  ((_ key: KN) -> Void)  = { (key: KN) in return },
-      finisher: ((_ key: KN) -> Void)  = { (key: KN) in return },
+      starter:  @escaping ((_ key: KN) -> Void)  = { (key: KN) in return },
+      finisher: @escaping ((_ key: KN) -> Void)  = { (key: KN) in return },
       rooter:   ((_ key: KN) -> Void)? = nil)
   {
     depthFirstSearchInternal (key,
@@ -506,15 +506,15 @@ public class Graph<KN:Hashable, KE:Hashable> {
   ///
   /// - parameter f: The function to apply to each visited node.
   ///
-  func depthFirstSearchAll (_ f: ((_ key: KN) -> Void)) {
+  func depthFirstSearchAll (_ f: @escaping ((_ key: KN) -> Void)) {
     depthFirstSearchInternal (nil,
       starter: { (node:Node<KN,KE>) in f (node.key) })
   }
   
   ///
   internal func depthFirstSearchInternal (_ key: KN?,
-    starter:  ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
-    finisher: ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
+    starter:  @escaping ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
+    finisher: @escaping ((_ node: Node<KN,KE>) -> Void)  = { (node: Node<KN,KE>) in return },
     rooter:   ((_ node: Node<KN,KE>) -> Void)? = nil)
   {
     typealias Box = SearchBox<Node<KN,KE>>
